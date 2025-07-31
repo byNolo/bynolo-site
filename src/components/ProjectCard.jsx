@@ -6,7 +6,7 @@ export function ProjectCard({ title, description, icon, link }) {
       href={link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group bg-zinc-800 dark:bg-gray-850 rounded-xl p-6 border border-zinc-700 hover:border-brand"
+      className="group rounded-xl p-6 border border-zinc-700 hover:border-brand"
       whileHover={{ scale: 1.02 }}
     >
       <div className="text-4xl mb-4 group-hover:text-brand">{icon}</div>
