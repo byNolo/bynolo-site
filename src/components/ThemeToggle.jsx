@@ -9,9 +9,14 @@ export function ThemeToggle({ theme, setTheme }) {
   return (
     <button
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="px-3 py-1 rounded-md border border-transparent hover:border-accent transition-colors duration-300"
+      className="px-3 py-1 rounded-md border border-transparent hover:border-accent transition-colors duration-300 flex items-center"
     >
-      {theme === 'dark' ? '🌞 Light Mode' : '🌙 Dark Mode'}
+      <span className="block md:hidden">
+        {theme === 'dark' ? '🌞' : '🌙'}
+      </span>
+      <span className="hidden md:block">
+        {theme === 'dark' ? '🌞 Light Mode' : '🌙 Dark Mode'}
+      </span>
     </button>
   );
 }
