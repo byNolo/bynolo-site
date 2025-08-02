@@ -6,11 +6,13 @@ import NavBar from "./components/NavBar";
 export default function App() {
   return (
     <Router>
-      <NavBar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        {/* future pages */}
-      </Routes>
+      <div className="min-h-screen bg-gray-950 text-white">
+        <NavBar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          {/* future pages */}
+        </Routes>
+      </div>
     </Router>
   );
 }

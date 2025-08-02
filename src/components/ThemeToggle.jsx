@@ -1,21 +1,53 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
-export function ThemeToggle({ theme, setTheme }) {
+export function ThemeToggle() {
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme');
+      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      return savedTheme || systemTheme;
+    }
+    return 'light';
+  });
+
+  // Initialize theme on component mount
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const initialTheme = savedTheme || systemTheme;
+    
+    if (initialTheme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    
+    setTheme(initialTheme);
+  }, []);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
     localStorage.setItem('theme', theme);
   }, [theme]);
 
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
+
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="px-3 py-1 rounded-md border border-transparent hover:border-accent transition-colors duration-300 flex items-center"
+      onClick={toggleTheme}
+      className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all duration-300 flex items-center justify-center"
+      aria-label="Toggle theme"
     >
-      <span className="block md:hidden">
+      <span className="text-lg">
         {theme === 'dark' ? '🌞' : '🌙'}
-      </span>
-      <span className="hidden md:block">
-        {theme === 'dark' ? '🌞 Light Mode' : '🌙 Dark Mode'}
       </span>
     </button>
   );
