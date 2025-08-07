@@ -1,17 +1,83 @@
 import { motion } from 'framer-motion';
 
-export function ProjectCard({ title, description, icon, link }) {
+export function ProjectCard({ 
+  title, 
+  description, 
+  icon, 
+  iconLabel,
+  link, 
+  tags = [], 
+  status = "Active",
+  variants 
+}) {
   return (
-    <motion.a
-      href={link}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group rounded-xl p-6 border border-zinc-700 hover:border-brand"
-      whileHover={{ scale: 1.02 }}
+    <motion.div
+      variants={variants}
+      className="group"
     >
-      <div className="text-4xl mb-4 group-hover:text-brand">{icon}</div>
-      <h3 className="text-xl font-semibold">{title}</h3>
-      <p className="mt-2 text-zinc-400">{description}</p>
-    </motion.a>
+      <div className="relative bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-green-500/30 transition-all duration-300 h-full">
+        {/* Status Badge */}
+        <div className="absolute top-4 right-4">
+          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+            status === 'Active' ? 'bg-green-500/20 text-green-400' :
+            status === 'In Development' ? 'bg-yellow-500/20 text-yellow-400' :
+            status === 'Planning' ? 'bg-blue-500/20 text-blue-400' :
+            'bg-gray-500/20 text-gray-400'
+          }`}>
+            {status}
+          </span>
+        </div>
+
+        {/* Project Icon */}
+        <div 
+          className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300"
+          aria-label={iconLabel}
+          role="img"
+        >
+          {icon}
+        </div>
+
+        {/* Project Content */}
+        <h3 className="text-2xl font-bold mb-4 group-hover:text-green-400 transition-colors">
+          {title}
+        </h3>
+        <p className="text-gray-400 mb-6 leading-relaxed">
+          {description}
+        </p>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {tags.map((tag) => (
+            <span 
+              key={tag}
+              className="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-sm"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* CTA Button */}
+        <motion.a
+          href={link}
+          target={link !== '#' ? "_blank" : undefined}
+          rel={link !== '#' ? "noopener noreferrer" : undefined}
+          className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 ${
+            link !== '#' 
+              ? 'bg-green-500 hover:bg-green-400 text-white hover:scale-105' 
+              : 'bg-gray-700 text-gray-400 cursor-not-allowed'
+          }`}
+          whileHover={link !== '#' ? { scale: 1.05 } : {}}
+          whileTap={link !== '#' ? { scale: 0.95 } : {}}
+        >
+          {link !== '#' ? 'View Project' : 'Coming Soon'}
+          {link !== '#' && (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          )}
+        </motion.a>
+      </div>
+    </motion.div>
   );
 }
