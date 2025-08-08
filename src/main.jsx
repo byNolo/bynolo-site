@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
@@ -9,6 +9,9 @@ import Projects from "./pages/Projects.jsx";
 import Contact from "./pages/Contact.jsx";
 import Layout from "./components/Layout.jsx";
 
+// Lazy load Hub component for code splitting
+const Hub = React.lazy(() => import("./pages/Hub.jsx"));
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -18,6 +21,21 @@ const router = createBrowserRouter([
       { path: "/about", element: <About /> },
       { path: "/projects", element: <Projects /> },
       { path: "/contact", element: <Contact /> },
+      { 
+        path: "/hub", 
+        element: (
+          <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+              <div className="text-center">
+                <div className="w-8 h-8 border-4 border-green-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-gray-400">Loading Hub...</p>
+              </div>
+            </div>
+          }>
+            <Hub />
+          </Suspense>
+        )
+      },
     ],
   },
 ]);

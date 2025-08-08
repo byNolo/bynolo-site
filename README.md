@@ -2,7 +2,7 @@
 
 # byNolo Site
 
-This repository serves as my personal portfolio and project launcher for everything byNolo. It showcases my work and provides a central hub to access and launch all projects byNolo. The site is built using React and Vite for the frontend, with a Python backend API.
+This repository serves as my personal portfolio and central hub for everything byNolo. It showcases my work and provides a unified access point to launch all byNolo projects, services, and tools. The site combines portfolio functionality with a comprehensive service launcher, making it easy to discover and access all things byNolo.
 
 ## Project Structure
 

@@ -1,14 +1,15 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const defaultStats = [
-  { value: "5+", label: "Projects", description: "Active projects in development" },
+  { value: "6+", label: "Services", description: "Live services and tools available" },
   { value: "100%", label: "Open Source", description: "All projects are open source" },
-  { value: "∞", label: "Possibilities", description: "Unlimited possibilities for innovation", ariaLabel: "Infinite possibilities" }
+  { value: "24/7", label: "Available", description: "Hub accessible anytime, anywhere" }
 ];
 
 export default function HeroSection({ stats = defaultStats }) {
+  const projectsButtonDescId = useId();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -73,7 +74,7 @@ export default function HeroSection({ stats = defaultStats }) {
         variants={itemVariants}
         className="text-lg sm:text-xl lg:text-2xl text-gray-300 max-w-3xl mb-8 leading-relaxed"
       >
-        A collection of handcrafted web tools, open-source projects, and creative experiments.
+        Your central hub for handcrafted web tools, open-source projects, and creative experiments.
         <span className="block mt-2 text-green-400 font-medium">
           Building ideas into reality, one project at a time.
         </span>
@@ -92,14 +93,31 @@ export default function HeroSection({ stats = defaultStats }) {
           whileTap="tap"
         >
           <Link
-            to="/projects"
+            to="/hub"
             className="group relative inline-flex items-center justify-center px-8 py-4 rounded-full text-white bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transition-all duration-300 font-semibold text-lg shadow-lg hover:shadow-xl overflow-hidden focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-gray-950"
-            aria-describedby="projects-button-desc"
+            aria-describedby="hub-button-desc"
           >
-            <span className="relative z-10">View Projects</span>
+            <span className="relative z-10">Launch Hub</span>
             <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-green-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
           </Link>
-          <span id="projects-button-desc" className="sr-only">
+          <span id="hub-button-desc" className="sr-only">
+            Navigate to the hub to access all byNolo services and tools
+          </span>
+        </motion.div>
+
+        <motion.div
+          variants={buttonVariants}
+          whileHover="hover"
+          whileTap="tap"
+        >
+          <Link
+            to="/projects"
+            className="inline-flex items-center justify-center px-8 py-4 rounded-full border-2 border-gray-600 text-gray-200 hover:border-green-500 hover:text-green-400 transition-all duration-300 font-semibold text-lg backdrop-blur-sm bg-gray-800/10 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-gray-950"
+            aria-describedby={projectsButtonDescId}
+          >
+            View Projects
+          </Link>
+          <span id={projectsButtonDescId} className="sr-only">
             Navigate to the projects page to view my portfolio of work
           </span>
         </motion.div>

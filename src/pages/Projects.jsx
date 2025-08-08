@@ -1,6 +1,9 @@
 
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { ProjectCard } from '../components/ProjectCard';
+
+const MotionLink = motion(Link);
 
 const projects = [
   {
@@ -96,10 +99,10 @@ export default function Projects() {
             transition={{ delay: 0.2, duration: 0.8 }}
           >
             <h1 className="text-5xl md:text-7xl font-bold mb-6">
+              <span className="text-white">Projects</span>{' - '}
               <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
                 byNolo
-              </span>{' '}
-              <span className="text-white">Projects</span>
+              </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
               Explore our collection of public projects, open source contributions, and innovative solutions. 
@@ -184,6 +187,50 @@ export default function Projects() {
         </div>
       </motion.section>
 
+      {/* Hub CTA Section */}
+      <motion.section 
+        className="py-20 bg-gradient-to-r from-green-950/20 to-blue-950/20"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            whileInView={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Access <span className="text-green-400">Live Services</span>
+            </h2>
+            <p className="text-xl text-gray-400 mb-8 leading-relaxed">
+              Many of these projects are live and available to use right now. 
+              Visit the byNolo Hub to access all active services, tools, and applications.
+            </p>
+            <MotionLink
+              to="/hub"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Launch Hub
+              <svg 
+                className="w-5 h-5" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                role="img"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </MotionLink>
+          </motion.div>
+        </div>
+      </motion.section>
+
       {/* Call to Action */}
       <motion.section 
         className="py-20 bg-gradient-to-r from-green-500/10 to-blue-500/10"
@@ -206,17 +253,24 @@ export default function Projects() {
               We're always looking for new opportunities to create amazing projects. 
               Whether you have an idea or want to contribute to existing work, let's connect!
             </p>
-            <motion.a
-              href="/contact"
+            <MotionLink
+              to="/contact"
               className="inline-flex items-center gap-2 px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-medium rounded-xl transition-all duration-300"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               Get In Touch
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg 
+                className="w-5 h-5" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                role="img"
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-            </motion.a>
+            </MotionLink>
           </motion.div>
         </div>
       </motion.section>
