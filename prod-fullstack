@@ -51,13 +51,13 @@ fi
 
 cd ..
 
-# Start backend in background using tmux
+# Start backend in background using tmux with gunicorn
 echo "🔧 Starting backend server (port $BACKEND_PORT)..."
-tmux new-session -d -s bynolo-prod-backend -c "$(pwd)/api" "source venv/bin/activate && FLASK_ENV=production python run.py" 2>/dev/null || {
+tmux new-session -d -s bynolo-prod-backend -c "$(pwd)/api" "source venv/bin/activate && gunicorn -c gunicorn.conf.py wsgi:application" 2>/dev/null || {
     echo "⚠️  Backend session exists, killing and restarting..."
     tmux kill-session -t bynolo-prod-backend 2>/dev/null || true
     sleep 1
-    tmux new-session -d -s bynolo-prod-backend -c "$(pwd)/api" "source venv/bin/activate && FLASK_ENV=production python run.py"
+    tmux new-session -d -s bynolo-prod-backend -c "$(pwd)/api" "source venv/bin/activate && gunicorn -c gunicorn.conf.py wsgi:application"
 }
 
 # Wait a moment for backend to start
