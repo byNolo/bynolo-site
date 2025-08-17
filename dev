@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# byNolo Development Environment Manager
+# Simple script to manage development services
+
+case "${1:-help}" in
+    "start")
+        echo "🚀 Starting development services..."
+        tmux new-session -d -s bynolo-backend -c "$(pwd)/api" '../.venv/bin/python run.py' 2>/dev/null || echo "Backend session exists"
+        tmux new-session -d -s bynolo-frontend -c "$(pwd)" 'npm run dev:frontend' 2>/dev/null || echo "Frontend session exists"
+        sleep 2
+        echo "✅ Services started!"
+        echo "🌐 Frontend: http://localhost:5173"
+        echo "🔧 Backend:  http://localhost:5000"
+        ;;
+    "stop")
+        echo "🛑 Stopping development services..."
+        tmux kill-session -t bynolo-backend 2>/dev/null || true
+        tmux kill-session -t bynolo-frontend 2>/dev/null || true
+        pkill -f "python.*run.py" 2>/dev/null || true
+        pkill -f "vite" 2>/dev/null || true
+        echo "✅ Services stopped"
+        ;;
+    "status")
+        echo "📊 Service Status:"
+        if lsof -i :5000 >/dev/null 2>&1; then
+            echo "✅ Backend running (port 5000)"
+        else
+            echo "❌ Backend not running"
+        fi
+        if lsof -i :5173 >/dev/null 2>&1; then
+            echo "✅ Frontend running (port 5173)"
+        else
+            echo "❌ Frontend not running"
+        fi
+        ;;
+    "logs")
+        service=${2:-"backend"}
+        if [ "$service" = "frontend" ]; then
+            tmux attach -t bynolo-frontend
+        else
+            tmux attach -t bynolo-backend
+        fi
+        ;;
+    *)
+        echo "byNolo Development Manager"
+        echo ""
+        echo "Usage: $0 [command]"
+        echo ""
+        echo "Commands:"
+        echo "  start        Start both services"
+        echo "  stop         Stop all services"
+        echo "  status       Check service status"
+        echo "  logs [type]  View logs (backend|frontend)"
+        echo ""
+        echo "Manual commands:"
+        echo "  npm run dev        - Frontend only"
+        echo "  npm run dev:backend - Backend only"
+        ;;
+esac

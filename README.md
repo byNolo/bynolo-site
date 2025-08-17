@@ -2,42 +2,36 @@
 
 # byNolo Site
 
-This repository serves as my personal portfolio and central hub for everything byNolo. It showcases my work and provides a unified access point to launch all byNolo projects, services, and tools. The site combines portfolio functionality with a comprehensive service launcher, making it easy to discover and access all things byNolo.
+Modern React portfolio and service hub with optional Flask API backend.
 
-## Project Structure
+## 🚀 Quick Start
 
-- `src/` - React frontend source code
-- `api/` - Python backend API (Flask or similar)
-- `public/` - Static assets
-- `index.html` - Main HTML file
+```bash
+# Setup (first time)
+npm run setup
 
-## Getting Started
+# Development
+npm start
 
+# Production
+npm run prod
+```
 
-### Frontend
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
+## 📋 Commands
 
+- `npm start` - Start development services
+- `npm run prod` - Production server for Cloudflare Tunnel
+- `npm run build` - Build for production
+- `npm run setup` - Initial setup
 
-### Backend
-1. Create a Python virtual environment and activate it.
-2. Install dependencies:
-   ```bash
-   pip install -r api/requirements.txt
-   ```
-3. Run the backend server:
-   ```bash
-   python api/run.py
-   ```
+## 🌐 Deployment
 
-## Contributing
-This is a personal project under the byNolo brand and is not open for external contributions.
+For Cloudflare Tunnel:
+1. `npm run prod`
+2. `cloudflared tunnel --url http://localhost:8080`
 
-## License
-This project is licensed under the Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License (CC BY-NC-ND 4.0). See [LICENSE](LICENSE) for details.
+For full-stack with API:
+1. `./prod-fullstack`
+2. `cloudflared tunnel --url http://localhost`
+
+See [GUIDE.md](GUIDE.md) for complete documentation.

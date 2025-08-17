@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# Production deployment for byNolo site
+# Serves static files for Cloudflare Tunnel
+
+set -e
+
+PORT=${1:-8080}
+
+echo "🚀 Starting byNolo production server..."
+
+# Build if needed
+if [ ! -d "dist" ] || [ "src" -nt "dist" ]; then
+    echo "📦 Building production version..."
+    npm run build
+fi
+
+# Check if serve is available
+if ! command -v serve &> /dev/null; then
+    echo "📦 Installing serve..."
+    npm install -g serve
+fi
+
+echo "✅ Starting server on port $PORT"
+echo "🌐 Access: http://localhost:$PORT"
+echo "📋 For Cloudflare Tunnel: cloudflared tunnel --url http://localhost:$PORT"
+echo ""
+
+serve -s dist -l $PORT

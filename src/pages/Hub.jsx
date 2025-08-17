@@ -1,13 +1,14 @@
 // pages/Hub.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import GradientMesh from '../components/GradientMesh';
 import AnimatedBackground from '../components/AnimatedBackground';
+import apiClient from '../services/api';
 
 
-// Category configuration
-const categories = {
+// Default categories configuration (fallback)
+const defaultCategories = {
   service: {
     id: 'service',
     name: 'Services',
@@ -105,7 +106,7 @@ const itemVariants = {
   }
 };
 
-const HubCard = ({ item }) => {
+const HubCard = ({ item, categories }) => {
   const isExternal = item.link.startsWith('http://') || item.link.startsWith('https://');
   const statusColors = {
     Live: 'bg-green-500', 
@@ -219,11 +220,55 @@ const HubCard = ({ item }) => {
 };
 
 export default function Hub() {
-  const [filter, setFilter] = useState('all');
-  
+  const [hubItems, setHubItems] = useState([]);
+  const [categories, setCategories] = useState(defaultCategories);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+
+  useEffect(() => {
+    const fetchHubData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch hub items and categories
+        const [itemsResponse, categoriesResponse] = await Promise.all([
+          apiClient.getHubItems(),
+          apiClient.getHubCategories()
+        ]);
+        
+        setHubItems(itemsResponse.items || []);
+        setCategories(categoriesResponse.categories || defaultCategories);
+      } catch (err) {
+        console.error('Failed to fetch hub data:', err);
+        setError('Failed to load hub data. Please try again later.');
+        // Fallback to static data
+        setHubItems([
+          {
+            id: 1,
+            title: "Vinyl Vote",
+            description: "Weekly album voting platform",
+            icon: "🎵",
+            iconType: "emoji",
+            iconLabel: "Musical note",
+            link: "https://vinylvote.bynolo.com",
+            status: "Live",
+            categories: ["app", "service"],
+            color: "from-[#1DB954] to-[#1ED760]"
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHubData();
+  }, []);
+
+  // Compute filtered items and category counts (must be before any conditional returns)
   const filteredItems = useMemo(() => {
-    return filter === 'all' ? hubItems : hubItems.filter(i => i.categories.includes(filter));
-  }, [filter]);
+    return selectedCategory === 'all' ? hubItems : hubItems.filter(i => i.categories.includes(selectedCategory));
+  }, [selectedCategory, hubItems]);
 
   const categoryCountMap = useMemo(() => {
     const countMap = {};
@@ -243,7 +288,19 @@ export default function Hub() {
     });
     
     return countMap;
-  }, []);
+  }, [hubItems, categories]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
+          <p className="text-gray-300">Loading hub...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative min-h-screen text-white pt-20 overflow-hidden">
@@ -277,36 +334,35 @@ export default function Hub() {
         transition={{ delay: 0.6 }}
       >
         {/* All filter */}
-        <button
-          onClick={() => setFilter('all')}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-            filter === 'all'
-              ? 'bg-green-500 text-white shadow-lg'
+        <motion.button
+          onClick={() => setSelectedCategory('all')}
+          className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+            selectedCategory === 'all'
+              ? 'bg-white text-gray-900 shadow-lg'
               : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
           }`}
-          aria-pressed={filter === 'all'}
         >
           All
-        </button>
+        </motion.button>
 
         {/* Category filters */}
         {Object.values(categories).map(category => {
           const categoryCount = categoryCountMap[category.id];
           
           return (
-            <button
+            <motion.button
               key={category.id}
-              onClick={() => setFilter(category.id)}
+              onClick={() => setSelectedCategory(category.id)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                filter === category.id
+                selectedCategory === category.id
                   ? `bg-gradient-to-r ${category.color} text-white shadow-lg`
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
               }`}
               title={category.description}
-              aria-pressed={filter === category.id}
+              aria-pressed={selectedCategory === category.id}
             >
               {category.name} ({categoryCount})
-            </button>
+            </motion.button>
           );
         })}
       </motion.div>
@@ -320,7 +376,7 @@ export default function Hub() {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
           {filteredItems.map(item => (
-            <HubCard key={item.id} item={item} />
+                              <HubCard key={item.id} item={item} categories={categories} />
           ))}
         </div>
       </motion.div>

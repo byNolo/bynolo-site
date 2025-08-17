@@ -1,7 +1,13 @@
 # Environment files
 .env
-.env.*           # Covers .env.local, .env.production, etc.
+.env.*
 api/.env
+
+# Deployment
+deployment/
+
+# Data Base
+*.db
 
 # Python
 __pycache__/

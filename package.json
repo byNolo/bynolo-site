@@ -4,10 +4,20 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "./dev",
+    "dev:frontend": "vite",
+    "dev:backend": "cd api && python run.py",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "./dev start",
+    "stop": "./dev stop",
+    "status": "./dev status",
+    "setup": "./dev-setup.sh",
+    "prod": "./prod",
+    "prod:fullstack": "./prod-fullstack",
+    "prod:stop": "./prod-fullstack stop",
+    "deploy": "./deploy.sh"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.11",
@@ -25,6 +35,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
+    "concurrently": "^9.2.0",
     "eslint": "^9.30.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",

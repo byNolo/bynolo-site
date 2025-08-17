@@ -7,6 +7,8 @@ import Home from "./pages/Home.jsx";
 import About from "./pages/About.jsx";
 import Projects from "./pages/Projects.jsx";
 import Contact from "./pages/Contact.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
+import TermsOfService from "./pages/TermsOfService.jsx";
 import Layout from "./components/Layout.jsx";
 
 // Lazy load Hub component for code splitting
@@ -21,6 +23,8 @@ const router = createBrowserRouter([
       { path: "/about", element: <About /> },
       { path: "/projects", element: <Projects /> },
       { path: "/contact", element: <Contact /> },
+      { path: "/privacy", element: <PrivacyPolicy /> },
+      { path: "/terms", element: <TermsOfService /> },
       { 
         path: "/hub", 
         element: (

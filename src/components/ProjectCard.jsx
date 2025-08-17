@@ -4,6 +4,7 @@ export function ProjectCard({
   title, 
   description, 
   icon, 
+  iconType = 'emoji',
   iconLabel,
   link, 
   tags = [], 
@@ -15,7 +16,20 @@ export function ProjectCard({
       variants={variants}
       className="group"
     >
-      <div className="relative bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-green-500/30 transition-all duration-300 h-full">
+      <div className="relative bg-gray-900/50 backdrop-blur-sm border border-gray-800 rounded-2xl p-8 hover:border-green-500/30 transition-all duration-300 h-full flex flex-col items-start">
+        {/* Project Icon (emoji or image) above the text, left-aligned */}
+        <div
+          className="text-6xl group-hover:scale-110 transition-transform duration-300 flex items-center justify-start mb-4"
+          aria-label={iconLabel}
+          role="img"
+        >
+          {iconType === 'image' && icon ? (
+            <img src={icon} alt={iconLabel || title} className="w-14 h-14 object-contain" />
+          ) : (
+            icon
+          )}
+        </div>
+
         {/* Status Badge */}
         <div className="absolute top-4 right-4">
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -28,16 +42,6 @@ export function ProjectCard({
           </span>
         </div>
 
-        {/* Project Icon */}
-        <div 
-          className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300"
-          aria-label={iconLabel}
-          role="img"
-        >
-          {icon}
-        </div>
-
-        {/* Project Content */}
         <h3 className="text-2xl font-bold mb-4 group-hover:text-green-400 transition-colors">
           {title}
         </h3>

@@ -1,6 +1,7 @@
 
 import { motion } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import apiClient from '../services/api';
 
 const contactMethods = [
   {
@@ -70,7 +71,7 @@ const faqData = [
   },
   {
     question: "What technologies do you specialize in?",
-    answer: "React, Node.js, TypeScript, Python, and modern web technologies."
+    answer: "Python, React, C, and modern web technologies."
   },
   {
     question: "Are you available for collaborations?",
@@ -87,6 +88,7 @@ export default function Contact() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(null);
   const timeoutRef = useRef(null);
 
   // Cleanup timeout on component unmount
@@ -108,21 +110,27 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     
     // Clear any existing timeout
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsSubmitting(false);
-    setSubmitted(true);
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    
-    // Reset success message after 5 seconds with proper cleanup
-    timeoutRef.current = setTimeout(() => setSubmitted(false), 5000);
+    try {
+      await apiClient.submitContactForm(formData);
+      
+      setIsSubmitting(false);
+      setSubmitted(true);
+      setFormData({ name: '', email: '', subject: '', message: '' });
+      
+      // Reset success message after 5 seconds with proper cleanup
+      timeoutRef.current = setTimeout(() => setSubmitted(false), 5000);
+    } catch (err) {
+      console.error('Failed to submit contact form:', err);
+      setError('Failed to send message. Please try again or contact me directly.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -261,6 +269,15 @@ export default function Contact() {
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-4 bg-red-900/50 border border-red-500/50 rounded-xl text-red-200"
+                  >
+                    {error}
+                  </motion.div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-2">

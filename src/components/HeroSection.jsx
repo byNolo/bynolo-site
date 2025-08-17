@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
 const defaultStats = [
-  { value: "6+", label: "Services", description: "Live services and tools available" },
+  { value: "5+", label: "Services", description: "Live services and tools available" },
   { value: "100%", label: "Open Source", description: "All projects are open source" },
   { value: "24/7", label: "Available", description: "Hub accessible anytime, anywhere" }
 ];

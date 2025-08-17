@@ -1,7 +1,9 @@
 
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { ProjectCard } from '../components/ProjectCard';
+import apiClient from '../services/api';
 
 const MotionLink = motion(Link);
 
@@ -81,6 +83,51 @@ const itemVariants = {
 };
 
 export default function Projects() {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.getProjects();
+        setProjects(response.projects || []);
+      } catch (err) {
+        console.error('Failed to fetch projects:', err);
+        setError('Failed to load projects. Please try again later.');
+        // Fallback to static data if API fails
+        setProjects([
+          {
+            id: 1,
+            title: "byNolo Portfolio",
+            description: "A sleek, modern personal site to showcase all my projects. Built with Vite, Tailwind, and React, with dark mode and smooth animations.",
+            tech_stack: ["React", "Vite", "Tailwind", "Framer Motion"],
+            github_url: "https://github.com/byNolo/bynolo-site",
+            live_url: "https://bynolo.com",
+            status: "Active"
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto mb-4"></div>
+          <p className="text-gray-300">Loading projects...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Hero Section */}
@@ -175,10 +222,11 @@ export default function Projects() {
                 key={project.id}
                 title={project.title}
                 description={project.description}
-                icon={project.icon}
-                iconLabel={project.iconLabel}
-                link={project.link}
-                tags={project.tags}
+                icon={project.icon || "🚀"}
+                iconType={project.iconType || 'emoji'}
+                iconLabel={project.iconLabel || `${project.title} project`}
+                link={project.github_url || '#'}
+                tags={project.tech_stack || []}
                 status={project.status}
                 variants={itemVariants}
               />
