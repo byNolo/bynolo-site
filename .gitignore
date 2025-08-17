@@ -58,3 +58,5 @@ coverage/
 *.pem
 *.crt
 *.key
+
+bynolo-prod-fullstack.service
