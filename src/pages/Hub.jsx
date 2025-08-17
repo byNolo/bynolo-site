@@ -108,6 +108,7 @@ const itemVariants = {
 
 const HubCard = ({ item, categories }) => {
   const isExternal = item.link.startsWith('http://') || item.link.startsWith('https://');
+  const isComingSoon = item.link === '#';
   const statusColors = {
     Live: 'bg-green-500', 
     Beta: 'bg-blue-500',
@@ -119,13 +120,13 @@ const HubCard = ({ item, categories }) => {
   const cardContent = (
     <motion.div
       variants={itemVariants}
-      whileHover={{ rotateX: 4, rotateY: -4, scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
-      className="group relative cursor-pointer h-full"
+      whileHover={isComingSoon ? {} : { rotateX: 4, rotateY: -4, scale: 1.03 }}
+      whileTap={isComingSoon ? {} : { scale: 0.97 }}
+      className={`group relative ${isComingSoon ? 'cursor-default' : 'cursor-pointer'} h-full`}
       style={{ perspective: '1000px' }}
     >
       {/* Glow halo */}
-      <div className={`absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 bg-gradient-to-r ${item.color}`} />
+      <div className={`absolute inset-0 rounded-xl opacity-0 ${isComingSoon ? '' : 'group-hover:opacity-100'} blur-xl transition-all duration-500 bg-gradient-to-r ${item.color}`} />
       
       <div className="relative bg-gray-900/60 backdrop-blur-md border border-gray-800 rounded-xl p-6 h-full shadow-lg flex flex-col">
         {/* Status pulse */}
@@ -158,7 +159,7 @@ const HubCard = ({ item, categories }) => {
 
         {/* Content */}
         <div className="mb-4 flex-1">
-          <h3 className="text-xl font-bold text-white group-hover:text-green-400 transition-colors mb-2">
+          <h3 className={`text-xl font-bold text-white ${isComingSoon ? '' : 'group-hover:text-green-400'} transition-colors mb-2`}>
             {item.title}
           </h3>
           <p className="text-gray-400 text-sm leading-relaxed">{item.description}</p>
@@ -181,12 +182,20 @@ const HubCard = ({ item, categories }) => {
           {/* Launch button visual only */}
           <div>
             <div 
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r ${item.color} text-white font-medium hover:shadow-lg transition-all duration-300`}
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${
+                isComingSoon 
+                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : `bg-gradient-to-r ${item.color} text-white hover:shadow-lg`
+              } font-medium transition-all duration-300`}
               aria-hidden="true"
             >
-              {isExternal ? 'Launch' : 'Visit'}
+              {isComingSoon ? 'Coming Soon' : (isExternal ? 'Launch' : 'Visit')}
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={isExternal ? "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" : "M9 5l7 7-7 7"} />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={
+                  isComingSoon 
+                    ? "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    : (isExternal ? "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" : "M9 5l7 7-7 7")
+                } />
               </svg>
             </div>
           </div>
@@ -196,7 +205,14 @@ const HubCard = ({ item, categories }) => {
   );
 
   // Wrap the entire card with appropriate link component
-  if (isExternal) {
+  if (isComingSoon) {
+    // Coming soon items are not clickable
+    return (
+      <div className="block h-full">
+        {cardContent}
+      </div>
+    );
+  } else if (isExternal) {
     return (
       <a
         href={item.link}

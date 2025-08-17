@@ -15,7 +15,7 @@ def validate_email(email):
 def get_projects():
     """Get all projects for the portfolio"""
     try:
-        projects = Project.query.order_by(Project.order_index.asc(), Project.created_at.desc()).all()
+        projects = Project.query.filter(Project.featured == True).order_by(Project.order_index.asc(), Project.created_at.desc()).all()
         projects_data = [project.to_dict() for project in projects]
         return jsonify({'projects': projects_data, 'count': len(projects_data)})
     except Exception as e:
@@ -39,6 +39,9 @@ def get_hub_items():
         status_filter = request.args.get('status')
         
         query = HubItem.query
+        
+        # Only show featured items
+        query = query.filter(HubItem.featured == True)
         
         if category_filter:
             # Filter by category (requires JSON search)
@@ -74,8 +77,8 @@ def get_hub_item(item_id):
 def get_hub_categories():
     """Get all available hub categories with counts"""
     try:
-        # Get all hub items to extract categories
-        hub_items = HubItem.query.all()
+        # Get all featured hub items to extract categories
+        hub_items = HubItem.query.filter(HubItem.featured == True).all()
         category_counts = {}
         
         for item in hub_items:
