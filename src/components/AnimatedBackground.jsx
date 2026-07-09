@@ -131,8 +131,8 @@ export default function AnimatedBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
-      style={{ background: 'transparent' }}
+      className="fixed inset-0 pointer-events-none z-0 block h-screen w-screen max-w-full"
+      style={{ background: 'transparent', display: 'block' }}
     />
   );
 }

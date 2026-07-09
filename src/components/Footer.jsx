@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <p>
           &copy; {new Date().getFullYear()}{" "}
-          <span className="bg-gradient-to-r from-green-400 to-green-600 bg-clip-text font-semibold text-transparent">
+          <span className="brand-gradient font-semibold">
             byNolo
           </span>
           . Built, hosted, and tuned with care.

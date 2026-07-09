@@ -22,7 +22,7 @@ export default function Home() {
               <Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> Founder studio for websites, apps, and self-hosted systems
             </Pill>
             <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[0.96] tracking-normal text-white sm:text-6xl lg:text-7xl">
-              Written, designed, and deployed byNolo.
+              Written, designed, and deployed <span className="brand-gradient">byNolo</span>.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300 sm:text-xl">
               I build polished web products with the practical parts included: front ends, APIs, auth, deployment, and the little details that make a site feel hand-made.

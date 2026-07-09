@@ -75,7 +75,7 @@ export default function NavBar() {
         >
           <Link
             to="/"
-            className="rounded-full pr-2 bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-xl font-bold text-transparent transition-all duration-300 hover:from-green-500 hover:to-green-700"
+            className="brand-gradient rounded-full pr-2 text-xl font-bold transition-all duration-300"
           >
             byNolo
           </Link>
