@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, CheckCircle2, Code2, Loader2, Mail, MessageSquareText, Send } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Code2, Loader2, Mail, Send } from "lucide-react";
 import PageShell from "../components/PageShell";
 import Section from "../components/Section";
-import { Pill } from "../components/ui";
 import apiClient from "../services/api";
 
 const contactMethods = [
@@ -75,10 +74,7 @@ export default function Contact() {
       <section className="px-5 pb-12 pt-32 sm:px-8 lg:px-12 lg:pt-40">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
           <div>
-            <Pill tone="live">
-              <MessageSquareText className="h-3.5 w-3.5" aria-hidden="true" /> Project intake
-            </Pill>
-            <h1 className="mt-6 text-5xl font-semibold leading-[0.98] text-white sm:text-6xl lg:text-7xl">Tell me what you want to build.</h1>
+            <h1 className="text-5xl font-semibold leading-[0.98] text-white sm:text-6xl lg:text-7xl">Tell me what you want to build.</h1>
           </div>
           <p className="max-w-2xl text-lg leading-8 text-zinc-300">
             A good first message does not need a perfect brief. Send the goal, the rough shape, the audience, and what would make the project feel like a win.

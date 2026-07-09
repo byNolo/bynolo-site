@@ -147,8 +147,7 @@ export default function Hub() {
     <PageShell dense background="particles">
       <section className="px-5 pb-12 pt-32 sm:px-8 lg:px-12 lg:pt-40">
         <div className="mx-auto max-w-7xl">
-          <Pill tone="live">Command center</Pill>
-          <div className="mt-6 grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
+          <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
             <div>
               <h1 className="text-5xl font-semibold leading-[0.98] text-white sm:text-6xl lg:text-7xl">The byNolo hub.</h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300">

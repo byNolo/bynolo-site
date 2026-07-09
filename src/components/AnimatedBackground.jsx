@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 
-export default function AnimatedBackground() {
+export default function AnimatedBackground({ className = "fixed inset-0 h-screen w-screen max-w-full" }) {
   const canvasRef = useRef(null);
   const particlesRef = useRef([]);
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -15,7 +15,7 @@ export default function AnimatedBackground() {
     // Initialize particles
     const initParticles = () => {
       const particles = [];
-      const particleCount = Math.min(80, Math.floor((canvas.width * canvas.height) / 15000));
+      const particleCount = Math.min(180, Math.floor((canvas.width * canvas.height) / 15000));
       
       for (let i = 0; i < particleCount; i++) {
         particles.push({
@@ -33,8 +33,11 @@ export default function AnimatedBackground() {
     
     // Set canvas size and reinitialize particles
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const parent = canvas.parentElement;
+      const width = parent?.clientWidth || window.innerWidth;
+      const height = parent?.clientHeight || window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
       
       // Reinitialize particles for new canvas size
       initParticles();
@@ -42,12 +45,17 @@ export default function AnimatedBackground() {
     
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+    const resizeObserver = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resizeCanvas) : null;
+    if (resizeObserver && canvas.parentElement) {
+      resizeObserver.observe(canvas.parentElement);
+    }
 
     // Mouse move handler
     const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
       mouseRef.current = {
-        x: e.clientX,
-        y: e.clientY,
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
       };
     };
 
@@ -122,6 +130,7 @@ export default function AnimatedBackground() {
     return () => {
       window.removeEventListener('resize', resizeCanvas);
       window.removeEventListener('mousemove', handleMouseMove);
+      resizeObserver?.disconnect();
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
@@ -131,7 +140,7 @@ export default function AnimatedBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 block h-screen w-screen max-w-full"
+      className={`${className} pointer-events-none z-0 block max-w-full`}
       style={{ background: 'transparent', display: 'block' }}
     />
   );

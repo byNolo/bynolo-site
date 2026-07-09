@@ -1,8 +1,7 @@
-import { ArrowRight, Cpu, Home, ServerCog, Sparkles, Wrench } from "lucide-react";
+import { ArrowRight, Cpu, Home, ServerCog, Wrench } from "lucide-react";
 import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
 import Section from "../components/Section";
-import { Pill } from "../components/ui";
 import { principles, stack } from "../data/siteContent";
 
 const currentWork = [
@@ -17,10 +16,7 @@ export default function About() {
       <section className="px-5 pb-12 pt-32 sm:px-8 lg:px-12 lg:pt-40">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
-            <Pill tone="live">
-              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> Sam, building as byNolo
-            </Pill>
-            <h1 className="mt-6 text-5xl font-semibold leading-[0.98] text-white sm:text-6xl lg:text-7xl">A practical builder with a soft spot for polished systems.</h1>
+            <h1 className="text-5xl font-semibold leading-[0.98] text-white sm:text-6xl lg:text-7xl">A practical builder with a soft spot for polished systems.</h1>
           </div>
           <div className="rounded-[2rem] border border-white/10 bg-zinc-950/70 p-6 shadow-2xl shadow-black/30 backdrop-blur sm:p-8">
             <p className="text-lg leading-8 text-zinc-300">

@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, GitBranch, Loader2, MonitorDot } from "lucide-react";
+import { ArrowRight, Loader2, MonitorDot } from "lucide-react";
 import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
 import Section from "../components/Section";
-import { EmptyState, Pill, ProjectLinks, ShowcaseCard } from "../components/ui";
+import { EmptyState, ProjectLinks, ShowcaseCard } from "../components/ui";
 import apiClient from "../services/api";
 import { fallbackProjects, showcase } from "../data/siteContent";
 
@@ -37,10 +37,7 @@ export default function Projects() {
     <PageShell dense>
       <section className="px-5 pb-12 pt-32 sm:px-8 lg:px-12 lg:pt-40">
         <div className="mx-auto max-w-7xl">
-          <Pill tone="live">
-            <GitBranch className="h-3.5 w-3.5" aria-hidden="true" /> Public builds and ecosystem work
-          </Pill>
-          <div className="mt-6 grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+          <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
             <div>
               <h1 className="text-5xl font-semibold leading-[0.98] text-white sm:text-6xl lg:text-7xl">Projects with a reason to exist.</h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300">

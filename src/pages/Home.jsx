@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
-import { ArrowRight, ArrowUpRight, Code2, Compass, Layers3, ServerCog, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Code2, Compass, Layers3, ServerCog } from "lucide-react";
 import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
 import Section from "../components/Section";
-import { ButtonLink, Pill, ShowcaseCard } from "../components/ui";
+import { ButtonLink, ShowcaseCard } from "../components/ui";
 import { fallbackProjects, process, services, showcase } from "../data/siteContent";
 
 export default function Home() {
@@ -18,10 +18,7 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
           >
-            <Pill tone="live">
-              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" /> Founder studio for websites, apps, and self-hosted systems
-            </Pill>
-            <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-[0.96] tracking-normal text-white sm:text-6xl lg:text-7xl">
+            <h1 className="max-w-4xl text-5xl font-semibold leading-[0.96] tracking-normal text-white sm:text-6xl lg:text-7xl">
               Written, designed, and deployed <span className="brand-gradient">byNolo</span>.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300 sm:text-xl">
@@ -126,8 +123,7 @@ export default function Home() {
       <section className="px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
         <div className="mx-auto grid max-w-7xl gap-8 rounded-[2rem] border border-green-300/20 bg-green-300/[0.06] p-6 sm:p-8 lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
           <div>
-            <Pill tone="live">Hub-first ecosystem</Pill>
-            <h2 className="mt-5 text-3xl font-semibold text-white sm:text-4xl">The hub is still the front door to everything live.</h2>
+            <h2 className="text-3xl font-semibold text-white sm:text-4xl">The hub is still the front door to everything live.</h2>
             <p className="mt-4 text-zinc-300">
               The command-center idea stays, now with clearer status, purpose, and launch context for each app and service.
             </p>
