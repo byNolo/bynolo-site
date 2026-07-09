@@ -20,7 +20,7 @@ export default function Projects() {
         setProjects(response.projects?.length ? response.projects : fallbackProjects);
       } catch (err) {
         console.error("Failed to fetch projects:", err);
-        setError("Live project data is unavailable, so curated fallback work is shown.");
+        setError("Live project data is unavailable, so a curated snapshot is shown.");
         setProjects(fallbackProjects);
       } finally {
         setLoading(false);
@@ -50,10 +50,10 @@ export default function Projects() {
             <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5">
               <div className="flex items-center gap-3">
                 <MonitorDot className="h-5 w-5 text-green-300" aria-hidden="true" />
-                <p className="text-sm font-semibold text-white">Live API data is preserved.</p>
+                <p className="text-sm font-semibold text-white">A tighter look at the work.</p>
               </div>
               <p className="mt-3 text-sm leading-6 text-zinc-400">
-                This page still reads `/api/projects`, then layers curated screenshots and positioning over the returned records.
+                Live tools, experiments, and product surfaces are grouped with a little more context and a lot less filler.
               </p>
             </div>
           </div>
@@ -88,7 +88,7 @@ export default function Projects() {
             </div>
 
             {projects.length === 0 ? (
-              <EmptyState title="No projects found" copy="The API returned an empty project list." />
+              <EmptyState title="No projects found" copy="There is no featured work to show right now." />
             ) : (
               <div className="grid gap-6 md:grid-cols-2">
                 {projects.slice(1).map((project) => {

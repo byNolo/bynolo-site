@@ -10,7 +10,7 @@ export default function Home() {
   const featured = fallbackProjects.slice(0, 3);
 
   return (
-    <PageShell dense>
+    <PageShell dense background="particles">
       <section className="px-5 pb-14 pt-32 sm:px-8 lg:px-12 lg:pb-24 lg:pt-40">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <motion.div
@@ -64,8 +64,8 @@ export default function Home() {
                   <ServerCog className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">A studio site with working infrastructure behind it.</p>
-                  <p className="text-xs text-zinc-500">Hub, projects API, contact intake, and deployment scripts stay intact.</p>
+                  <p className="text-sm font-semibold text-white">A studio site with a real ecosystem behind it.</p>
+                  <p className="text-xs text-zinc-500">Apps, services, experiments, and contact all in one place.</p>
                 </div>
               </div>
             </div>
@@ -129,7 +129,7 @@ export default function Home() {
             <Pill tone="live">Hub-first ecosystem</Pill>
             <h2 className="mt-5 text-3xl font-semibold text-white sm:text-4xl">The hub is still the front door to everything live.</h2>
             <p className="mt-4 text-zinc-300">
-              V2 keeps the central command-center idea, but presents each app and service with clearer status, purpose, and launch context.
+              The command-center idea stays, now with clearer status, purpose, and launch context for each app and service.
             </p>
             <Link to="/hub" className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-green-300 transition hover:text-green-200">
               Open hub <ArrowRight className="h-4 w-4" aria-hidden="true" />

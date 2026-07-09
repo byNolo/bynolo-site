@@ -73,11 +73,8 @@ export default function NavBar() {
           }`}
           aria-label="Primary navigation"
         >
-          <Link to="/" className="flex items-center gap-3 rounded-full pr-2">
-            <span className="grid h-9 w-9 place-items-center rounded-full border border-green-300/30 bg-green-300/10 text-sm font-black text-green-200">
-              bN
-            </span>
-            <span className="text-sm font-semibold text-white sm:text-base">byNolo</span>
+          <Link to="/" className="rounded-full pr-2 text-xl font-black tracking-normal text-green-400 transition hover:text-green-300">
+            byNolo
           </Link>
 
           <div className="hidden items-center gap-1 md:flex">

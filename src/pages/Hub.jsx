@@ -117,7 +117,7 @@ export default function Hub() {
         setCategories({ ...categoryMeta, ...(categoriesResponse.categories || {}) });
       } catch (err) {
         console.error("Failed to fetch hub data:", err);
-        setError("Live hub data is unavailable, so curated fallback services are shown.");
+        setError("Live hub data is unavailable, so a curated snapshot is shown.");
         setHubItems(fallbackHubItems);
         setCategories(categoryMeta);
       } finally {
@@ -144,7 +144,7 @@ export default function Hub() {
   }, [hubItems, selectedCategory]);
 
   return (
-    <PageShell dense>
+    <PageShell dense background="particles">
       <section className="px-5 pb-12 pt-32 sm:px-8 lg:px-12 lg:pt-40">
         <div className="mx-auto max-w-7xl">
           <Pill tone="live">Command center</Pill>
