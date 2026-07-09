@@ -1,0 +1,17 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="760" rx="42" fill="#08100E"/>
+  <rect x="52" y="52" width="1096" height="656" rx="32" fill="#0E1916" stroke="#244334"/>
+  <path d="M138 608C206 503 288 548 366 438C431 346 531 370 608 274C695 166 816 188 908 118" stroke="#22583A" stroke-width="22" stroke-linecap="round"/>
+  <path d="M138 608C206 503 288 548 366 438C431 346 531 370 608 274C695 166 816 188 908 118" stroke="#22C55E" stroke-width="8" stroke-linecap="round" stroke-dasharray="24 30"/>
+  <circle cx="366" cy="438" r="38" fill="#143323" stroke="#22C55E" stroke-width="5"/>
+  <circle cx="608" cy="274" r="38" fill="#143323" stroke="#22C55E" stroke-width="5"/>
+  <circle cx="908" cy="118" r="38" fill="#143323" stroke="#22C55E" stroke-width="5"/>
+  <rect x="690" y="380" width="360" height="198" rx="28" fill="#101F1A" stroke="#2B5E42"/>
+  <text x="728" y="430" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="850">Today’s SideQuest</text>
+  <text x="728" y="469" fill="#8FB8A2" font-family="Inter, Arial, sans-serif" font-size="19">Find a new local spot, log it, and rate the route.</text>
+  <rect x="728" y="512" width="126" height="38" rx="19" fill="#173A28"/>
+  <text x="758" y="537" fill="#9CF2BC" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800">Planning</text>
+  <rect x="134" y="106" width="370" height="150" rx="28" fill="#101F1A" stroke="#2B5E42"/>
+  <text x="170" y="158" fill="#9CF2BC" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="800">QUEST ENGINE</text>
+  <text x="170" y="203" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="900">3 routes</text>
+</svg>

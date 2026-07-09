@@ -1,89 +1,14 @@
-
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { ProjectCard } from '../components/ProjectCard';
-import apiClient from '../services/api';
-
-const MotionLink = motion(Link);
-
-const projects = [
-  {
-    id: 1,
-    title: "byNolo Portfolio",
-    description: "A sleek, modern personal site to showcase all my projects. Built with Vite, Tailwind, and React, with dark mode and smooth animations.",
-    icon: "🧑‍💻",
-    iconLabel: "Person coding",
-    link: "https://github.com/byNolo/bynolo-site",
-    tags: ["React", "Vite", "Tailwind", "Framer Motion"],
-    status: "Active"
-  },
-  {
-    id: 2,
-    title: "KeyN Authentication",
-    description: "Custom authentication system powering login across all byNolo projects. Secure, self-hosted, with session and JWT support.",
-    icon: "🔐",
-    iconLabel: "Lock representing security",
-    link: "https://github.com/byNolo/keyn",
-    tags: ["Auth", "JWT", "OAuth2", "Flask", "Security"],
-    status: "Active"
-  },
-  {
-    id: 3,
-    title: "SideQuest",
-    description: "Gamified daily side quest generator. Personalized quests based on location, preferences, and community ratings.",
-    icon: "🗺️",
-    iconLabel: "Map representing side quests",
-    link: "#",
-    tags: ["Flask", "Gamification", "Geo", "Automation"],
-    status: "Planning"
-  },
-  {
-    id: 4,
-    title: "Vinyl Vote",
-    description: "A weekly album rating platform for my friend group. Features user login, stats, charts, and admin dashboard.",
-    icon: "🎵",
-    iconLabel: "Music note for album voting",
-    link: "https://github.com/byNolo/vinyl-vote",
-    tags: ["Flask", "Music", "Voting", "Charts"],
-    status: "Active"
-  },
-  // {
-  //   id: 5,
-  //   title: "The Problemed Child",
-  //   description: "A multipurpose Discord bot with games, gambling, pets, and AI memory analytics. Custom-coded for our private server.",
-  //   icon: "🤖",
-  //   iconLabel: "Robot for Discord bot",
-  //   link: "https://github.com/byNolo/problemed-child",
-  //   tags: ["Py-Cord", "Games", "AI", "Bot"],
-  //   status: "Active"
-  // }
-];
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { y: 20, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: {
-      duration: 0.5
-    }
-  }
-};
+import { useEffect, useState } from "react";
+import { ArrowRight, GitBranch, Loader2, MonitorDot } from "lucide-react";
+import { Link } from "react-router-dom";
+import PageShell from "../components/PageShell";
+import Section from "../components/Section";
+import { EmptyState, Pill, ProjectLinks, ShowcaseCard } from "../components/ui";
+import apiClient from "../services/api";
+import { fallbackProjects, showcase } from "../data/siteContent";
 
 export default function Projects() {
-  const [projects, setProjects] = useState([]);
+  const [projects, setProjects] = useState(fallbackProjects);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -92,22 +17,11 @@ export default function Projects() {
       try {
         setLoading(true);
         const response = await apiClient.getProjects();
-        setProjects(response.projects || []);
+        setProjects(response.projects?.length ? response.projects : fallbackProjects);
       } catch (err) {
-        console.error('Failed to fetch projects:', err);
-        setError('Failed to load projects. Please try again later.');
-        // Fallback to static data if API fails
-        setProjects([
-          {
-            id: 1,
-            title: "byNolo Portfolio",
-            description: "A sleek, modern personal site to showcase all my projects. Built with Vite, Tailwind, and React, with dark mode and smooth animations.",
-            tech_stack: ["React", "Vite", "Tailwind", "Framer Motion"],
-            github_url: "https://github.com/byNolo/bynolo-site",
-            live_url: "https://bynolo.com",
-            status: "Active"
-          }
-        ]);
+        console.error("Failed to fetch projects:", err);
+        setError("Live project data is unavailable, so curated fallback work is shown.");
+        setProjects(fallbackProjects);
       } finally {
         setLoading(false);
       }
@@ -116,212 +30,99 @@ export default function Projects() {
     fetchProjects();
   }, []);
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-400 mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading projects...</p>
-        </div>
-      </div>
-    );
-  }
+  const leadProject = projects[0] || fallbackProjects[0];
+  const leadMeta = showcase[leadProject.title] || showcase.Portfolio;
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      {/* Hero Section */}
-      <motion.div 
-        className="relative overflow-hidden bg-gradient-to-br from-gray-950 via-gray-900 to-green-950"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-blue-500/10" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <motion.div 
-            className="text-center"
-            initial={{ y: 30, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-          >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">
-              <span className="text-white">Projects</span>{' - '}
-              <span className="bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
-                byNolo
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Explore our collection of public projects, open source contributions, and innovative solutions. 
-              Each project represents our commitment to quality, creativity, and community impact.
-            </p>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      {/* Stats Section */}
-      <motion.section 
-        className="py-16 bg-gray-900/50"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
-            {[
-              { label: "Active Projects", value: "5+" },
-              { label: "Technologies", value: "15+" },
-              // { label: "Contributors", value: "Growing" },
-              { label: "Open Source", value: "Always" }
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ y: 20, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-              >
-                <div className="text-3xl md:text-4xl font-bold text-green-400 mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-gray-400 text-sm md:text-base">
-                  {stat.label}
-                </div>
-              </motion.div>
-            ))}
+    <PageShell dense>
+      <section className="px-5 pb-12 pt-32 sm:px-8 lg:px-12 lg:pt-40">
+        <div className="mx-auto max-w-7xl">
+          <Pill tone="live">
+            <GitBranch className="h-3.5 w-3.5" aria-hidden="true" /> Public builds and ecosystem work
+          </Pill>
+          <div className="mt-6 grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+            <div>
+              <h1 className="text-5xl font-semibold leading-[0.98] text-white sm:text-6xl lg:text-7xl">Projects with a reason to exist.</h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300">
+                byNolo work usually starts as a real itch: a shared login system, a voting ritual, a better hub, or a playful tool that deserves to become usable.
+              </p>
+            </div>
+            <div className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-5">
+              <div className="flex items-center gap-3">
+                <MonitorDot className="h-5 w-5 text-green-300" aria-hidden="true" />
+                <p className="text-sm font-semibold text-white">Live API data is preserved.</p>
+              </div>
+              <p className="mt-3 text-sm leading-6 text-zinc-400">
+                This page still reads `/api/projects`, then layers curated screenshots and positioning over the returned records.
+              </p>
+            </div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Projects Grid */}
-      <motion.section 
-        className="py-20"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        whileInView="visible"
-        viewport={{ once: true, margin: "-50px", amount: 0.1 }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div 
-            className="text-center mb-16"
-            variants={itemVariants}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Featured <span className="text-green-400">Projects</span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              From innovative web applications to developer tools, here's what we're building
-            </p>
-          </motion.div>
+      <Section>
+        {loading ? (
+          <div className="flex items-center gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6 text-zinc-300">
+            <Loader2 className="h-5 w-5 animate-spin text-green-300" aria-hidden="true" /> Loading project index...
+          </div>
+        ) : (
+          <>
+            {error && <div className="mb-6 rounded-2xl border border-yellow-300/20 bg-yellow-300/10 p-4 text-sm text-yellow-100">{error}</div>}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {projects.map((project) => (
-              <ProjectCard
-                key={project.id}
-                title={project.title}
-                description={project.description}
-                icon={project.icon || "🚀"}
-                iconType={project.iconType || 'emoji'}
-                iconLabel={project.iconLabel || `${project.title} project`}
-                link={project.github_url || '#'}
-                tags={project.tech_stack || []}
-                status={project.status}
-                variants={itemVariants}
+            <div className="mb-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+              <ShowcaseCard
+                item={leadProject}
+                href={leadProject.live_url || leadProject.github_url}
+                image={leadMeta.image}
+                kicker={leadMeta.kicker}
+                impact={leadMeta.impact}
+                tags={leadProject.tech_stack}
+                status={leadProject.status}
               />
-            ))}
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-green-300">Featured build</p>
+                <h2 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">{leadProject.title}</h2>
+                <p className="mt-4 text-base leading-7 text-zinc-300">{leadProject.description}</p>
+                <ProjectLinks github={leadProject.github_url} live={leadProject.live_url} />
+              </div>
+            </div>
+
+            {projects.length === 0 ? (
+              <EmptyState title="No projects found" copy="The API returned an empty project list." />
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2">
+                {projects.slice(1).map((project) => {
+                  const meta = showcase[project.title] || showcase.Portfolio;
+                  return (
+                    <ShowcaseCard
+                      key={project.id || project.title}
+                      item={project}
+                      href={project.live_url || project.github_url}
+                      image={meta.image}
+                      kicker={meta.kicker}
+                      impact={meta.impact}
+                      tags={project.tech_stack}
+                      status={project.status}
+                    />
+                  );
+                })}
+              </div>
+            )}
+          </>
+        )}
+      </Section>
+
+      <section className="px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 rounded-[2rem] border border-white/10 bg-zinc-950/70 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-green-300">Want the live surfaces?</p>
+            <h2 className="mt-3 text-3xl font-semibold text-white">The hub connects the usable pieces.</h2>
           </div>
+          <Link to="/hub" className="inline-flex items-center justify-center gap-2 rounded-full bg-green-400 px-5 py-3 text-sm font-semibold text-[#041008] transition hover:bg-green-300">
+            Open the hub <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
-      </motion.section>
-
-      {/* Hub CTA Section */}
-      <motion.section 
-        className="py-20 bg-gradient-to-r from-green-950/20 to-blue-950/20"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Access <span className="text-green-400">Live Services</span>
-            </h2>
-            <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              Many of these projects are live and available to use right now. 
-              Visit the byNolo Hub to access all active services, tools, and applications.
-            </p>
-            <MotionLink
-              to="/hub"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-medium rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Launch Hub
-              <svg 
-                className="w-5 h-5" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                role="img"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </MotionLink>
-          </motion.div>
-        </div>
-      </motion.section>
-
-      {/* Call to Action */}
-      <motion.section 
-        className="py-20 bg-gradient-to-r from-green-500/10 to-blue-500/10"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ y: 30, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Ready to <span className="text-green-400">Collaborate?</span>
-            </h2>
-            <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              We're always looking for new opportunities to create amazing projects. 
-              Whether you have an idea or want to contribute to existing work, let's connect!
-            </p>
-            <MotionLink
-              to="/contact"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-medium rounded-xl transition-all duration-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Get In Touch
-              <svg 
-                className="w-5 h-5" 
-                fill="none" 
-                stroke="currentColor" 
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                role="img"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </MotionLink>
-          </motion.div>
-        </div>
-      </motion.section>
-    </div>
+      </section>
+    </PageShell>
   );
 }

@@ -1,37 +1,20 @@
 import { Outlet } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 
 import NavBar from "./NavBar";
 import Footer from "./Footer";
-import { ThemeToggle } from "./ThemeToggle";
 import ScrollToTop from "./ScrollToTop";
 
 export default function Layout() {
-  const [theme, setTheme] = useState(
-    () =>
-      localStorage.getItem("theme") ||
-      (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")
-  );
-  
   return (
     <>
       <ScrollToTop />
-      <motion.div
-        key={theme}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        className="flex flex-col min-h-screen bg-white text-gray-900 dark:bg-gray-950 dark:text-white transition-colors duration-500"
-      >
-        <NavBar>
-          <ThemeToggle theme={theme} setTheme={setTheme} />
-        </NavBar>
-      <main className="flex-grow px-6 md:px-12 py-12">
-        <Outlet />
-      </main>
+      <div className="min-h-screen bg-[#050806] text-white">
+        <NavBar />
+        <main>
+          <Outlet />
+        </main>
         <Footer />
-      </motion.div>
+      </div>
     </>
   );
 }

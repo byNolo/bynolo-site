@@ -1,0 +1,32 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="760" rx="42" fill="#07110D"/>
+  <rect x="42" y="42" width="1116" height="676" rx="28" fill="#0D1B14" stroke="#214B37"/>
+  <rect x="82" y="82" width="1036" height="72" rx="18" fill="#10251B"/>
+  <circle cx="123" cy="118" r="10" fill="#22C55E"/>
+  <circle cx="156" cy="118" r="10" fill="#F2C94C"/>
+  <circle cx="189" cy="118" r="10" fill="#EF4444"/>
+  <text x="236" y="126" fill="#DDFBEA" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700">Vinyl Vote</text>
+  <text x="918" y="126" fill="#7DD3A2" font-family="Inter, Arial, sans-serif" font-size="18">Weekly album room</text>
+  <rect x="82" y="196" width="430" height="420" rx="28" fill="#13251B" stroke="#27533C"/>
+  <circle cx="297" cy="406" r="142" fill="#050806" stroke="#1DB954" stroke-width="18"/>
+  <circle cx="297" cy="406" r="78" fill="#111827" stroke="#355B47" stroke-width="2"/>
+  <circle cx="297" cy="406" r="20" fill="#22C55E"/>
+  <path d="M234 327C276 300 339 308 377 346" stroke="#E7F9ED" stroke-width="9" stroke-linecap="round"/>
+  <rect x="560" y="196" width="558" height="92" rx="22" fill="#10251B"/>
+  <text x="594" y="234" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="27" font-weight="800">This week's pick</text>
+  <text x="594" y="265" fill="#8FB8A2" font-family="Inter, Arial, sans-serif" font-size="18">Rate, compare, and crown the album together.</text>
+  <rect x="560" y="328" width="258" height="206" rx="24" fill="#0F1F17" stroke="#2B5E42"/>
+  <text x="594" y="374" fill="#7DD3A2" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">ROOM SCORE</text>
+  <text x="594" y="443" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="76" font-weight="900">8.4</text>
+  <text x="696" y="443" fill="#8FB8A2" font-family="Inter, Arial, sans-serif" font-size="24">/10</text>
+  <rect x="594" y="482" width="180" height="16" rx="8" fill="#1F3D2D"/>
+  <rect x="594" y="482" width="143" height="16" rx="8" fill="#22C55E"/>
+  <rect x="860" y="328" width="258" height="206" rx="24" fill="#0F1F17" stroke="#2B5E42"/>
+  <text x="894" y="374" fill="#7DD3A2" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">LISTENERS</text>
+  <circle cx="926" cy="430" r="26" fill="#22C55E"/>
+  <circle cx="974" cy="430" r="26" fill="#60A5FA"/>
+  <circle cx="1022" cy="430" r="26" fill="#F59E0B"/>
+  <text x="894" y="493" fill="#DDFBEA" font-family="Inter, Arial, sans-serif" font-size="22">Votes close Friday</text>
+  <rect x="560" y="574" width="558" height="42" rx="21" fill="#183727"/>
+  <rect x="560" y="574" width="392" height="42" rx="21" fill="#22C55E"/>
+</svg>

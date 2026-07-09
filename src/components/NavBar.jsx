@@ -1,7 +1,15 @@
 
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, NavLink } from "react-router-dom";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { ArrowUpRight, Menu, X } from "lucide-react";
+
+const navItems = [
+  { to: "/hub", label: "Hub" },
+  { to: "/projects", label: "Projects" },
+  { to: "/about", label: "About" },
+  { to: "/contact", label: "Contact" },
+];
 
 export default function NavBar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -51,84 +59,65 @@ export default function NavBar() {
 
   return (
     <>
-      <motion.nav
-        className={`fixed top-0 left-0 right-0 z-50 flex justify-between items-center p-4 transition-all duration-300 ${
-          isScrolled
-            ? 'bg-gray-950/80 backdrop-blur-md border-b border-gray-800'
-            : 'bg-transparent'
-        }`}
+      <motion.header
+        className="fixed left-0 right-0 top-0 z-50 px-4 py-4 sm:px-6"
         initial={shouldReduceMotion ? false : { y: -100 }}
         animate={shouldReduceMotion ? false : { y: 0 }}
         transition={shouldReduceMotion ? false : { duration: 0.6, ease: "easeOut" }}
       >
-        <div className="flex items-center space-x-8">
-          <Link to="/" className="text-xl font-bold bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent hover:from-green-500 hover:to-green-700 transition-all duration-300">
-            byNolo
+        <nav
+          className={`mx-auto flex max-w-7xl items-center justify-between rounded-full border px-4 py-3 transition-all duration-300 ${
+            isScrolled
+              ? "border-white/10 bg-[#07100d]/85 shadow-2xl shadow-black/30 backdrop-blur-xl"
+              : "border-white/0 bg-transparent"
+          }`}
+          aria-label="Primary navigation"
+        >
+          <Link to="/" className="flex items-center gap-3 rounded-full pr-2">
+            <span className="grid h-9 w-9 place-items-center rounded-full border border-green-300/30 bg-green-300/10 text-sm font-black text-green-200">
+              bN
+            </span>
+            <span className="text-sm font-semibold text-white sm:text-base">byNolo</span>
           </Link>
-          <div className="hidden md:flex space-x-6">
-            <Link 
-              to="/hub" 
-              className="text-gray-300 hover:text-green-400 transition-colors duration-200 font-medium"
+
+          <div className="hidden items-center gap-1 md:flex">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `rounded-full px-4 py-2 text-sm font-medium transition ${
+                    isActive ? "bg-white/[0.08] text-white" : "text-zinc-400 hover:bg-white/[0.04] hover:text-white"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </div>
+
+          <div className="hidden items-center gap-3 md:flex">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 rounded-full bg-green-400 px-4 py-2 text-sm font-semibold text-[#041008] transition hover:bg-green-300"
             >
-              Hub
-            </Link>
-            <Link 
-              to="/about" 
-              className="text-gray-300 hover:text-green-400 transition-colors duration-200 font-medium"
-            >
-              About
-            </Link>
-            <Link 
-              to="/projects" 
-              className="text-gray-300 hover:text-green-400 transition-colors duration-200 font-medium"
-            >
-              Projects
-            </Link>
-            <Link 
-              to="/contact" 
-              className="text-gray-300 hover:text-green-400 transition-colors duration-200 font-medium"
-            >
-              Contact
+              Start a build <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-        </div>
-        
-        {/* Mobile menu button */}
-        <button
-          type="button"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="md:hidden text-gray-300 hover:text-green-400 transition-colors duration-200 p-2"
-          aria-label="Toggle mobile menu"
-          aria-expanded={isMobileMenuOpen}
-          aria-controls="mobile-menu-panel"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            {isMobileMenuOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            )}
-          </svg>
-        </button>
-      </motion.nav>
 
-      {/* Mobile menu */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="rounded-full border border-white/10 bg-white/[0.04] p-2 text-zinc-200 transition hover:border-green-300/40 hover:text-white md:hidden"
+            aria-label="Toggle mobile menu"
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu-panel"
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
+          </button>
+        </nav>
+      </motion.header>
+
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -137,36 +126,25 @@ export default function NavBar() {
             animate={shouldReduceMotion ? false : { opacity: 1, y: 0 }}
             exit={shouldReduceMotion ? false : { opacity: 0, y: -20 }}
             transition={shouldReduceMotion ? false : { duration: 0.2 }}
-            className="fixed top-16 left-0 right-0 z-40 bg-gray-950/95 backdrop-blur-md border-b border-gray-800 md:hidden"
+            className="fixed left-4 right-4 top-20 z-40 rounded-[1.5rem] border border-white/10 bg-[#07100d]/95 p-3 shadow-2xl shadow-black/40 backdrop-blur-xl md:hidden"
           >
-            <div className="flex flex-col space-y-4 p-6">
-              <Link
-                to="/hub"
-                className="text-gray-300 hover:text-green-400 transition-colors duration-200 font-medium text-lg"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Hub
-              </Link>
-              <Link
-                to="/about"
-                className="text-gray-300 hover:text-green-400 transition-colors duration-200 font-medium text-lg"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                About
-              </Link>
-              <Link
-                to="/projects"
-                className="text-gray-300 hover:text-green-400 transition-colors duration-200 font-medium text-lg"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Projects
-              </Link>
+            <div className="flex flex-col gap-1">
+              {navItems.map((item) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="rounded-2xl px-4 py-3 text-base font-medium text-zinc-200 transition hover:bg-white/[0.05] hover:text-white"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
               <Link
                 to="/contact"
-                className="text-gray-300 hover:text-green-400 transition-colors duration-200 font-medium text-lg"
+                className="mt-2 inline-flex items-center justify-center gap-2 rounded-2xl bg-green-400 px-4 py-3 text-sm font-semibold text-[#041008]"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Contact
+                Start a build <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </motion.div>

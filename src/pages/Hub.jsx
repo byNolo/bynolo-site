@@ -1,278 +1,125 @@
-// pages/Hub.jsx
-import React, { useState, useMemo, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import GradientMesh from '../components/GradientMesh';
-import AnimatedBackground from '../components/AnimatedBackground';
-import apiClient from '../services/api';
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Boxes,
+  CircleDot,
+  Clock3,
+  Code2,
+  Globe2,
+  Loader2,
+  Map,
+  Music,
+  PanelsTopLeft,
+  ShieldCheck,
+} from "lucide-react";
+import PageShell from "../components/PageShell";
+import { EmptyState, Pill } from "../components/ui";
+import apiClient from "../services/api";
+import { categoryMeta, fallbackHubItems, showcase } from "../data/siteContent";
 
-
-// Default categories configuration (fallback)
-const defaultCategories = {
-  service: {
-    id: 'service',
-    name: 'Services',
-    description: 'Core infrastructure and APIs',
-    color: 'from-blue-500 to-blue-600'
-  },
-  app: {
-    id: 'app', 
-    name: 'Applications',
-    description: 'Full-featured web applications',
-    color: 'from-purple-500 to-purple-600'
-  },
-  site: {
-    id: 'site',
-    name: 'Websites',
-    description: 'Marketing and portfolio sites',
-    color: 'from-green-500 to-green-600'
-  },
-  tool: {
-    id: 'tool',
-    name: 'Tools',
-    description: 'Development and utility tools',
-    color: 'from-yellow-500 to-yellow-600'
-  }
+const iconMap = {
+  Music,
+  ShieldCheck,
+  PanelsTopLeft,
+  Map,
+  Code2,
+  Globe2,
+  Boxes,
 };
 
-const hubItems = [
-  {
-    id: 1,
-    title: "Vinyl Vote",
-    description: "Weekly album voting platform",
-    icon: "🎵",
-    iconType: "emoji",
-    iconLabel: "Musical note",
-    link: "https://vinylvote.bynolo.com",
-    status: "Live",
-    categories: ["app", "service"],
-    color: "from-[#1DB954] to-[#1ED760]"
-  },
-  {
-    id: 2,
-    title: "KeyN Authentication",
-    description: "Secure authentication system powering all byNolo projects",
-    icon: "🔐",
-    iconType: "emoji",
-    iconLabel: "Lock representing security",
-    link: "https://keyn.bynolo.com",
-    status: "Live",
-    categories: ["service"],
-    color: "from-blue-500 to-blue-600"
-  },
-  {
-    id: 3,
-    title: "Portfolio",
-    description: "This site - showcasing projects and serving as the central hub",
-    icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
-    iconType: "image",
-    iconLabel: "React logo",
-    link: "/",
-    status: "Active",
-    categories: ["site"],
-    color: "from-green-500 to-green-600"
-  },
-  {
-    id: 4,
-    title: "SideQuest",
-    description: "Gamified daily adventures and local discovery platform",
-    icon: "🗺️",
-    iconType: "emoji",
-    iconLabel: "Map representing adventure",
-    link: "https://sidequest.bynolo.com",
-    status: "Planning",
-    categories: ["app", "tool"],
-    color: "from-purple-500 to-purple-600"
-  },
-];
+function resolveIcon(item) {
+  if (item.iconType === "lucide" && iconMap[item.icon]) return iconMap[item.icon];
+  const title = item.title?.toLowerCase() || "";
+  if (title.includes("vinyl")) return Music;
+  if (title.includes("keyn") || title.includes("auth")) return ShieldCheck;
+  if (title.includes("sidequest")) return Map;
+  if (title.includes("portfolio")) return PanelsTopLeft;
+  return Boxes;
+}
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
-      delayChildren: 0.3
-    }
-  }
-};
+function statusTone(status) {
+  if (status === "Live" || status === "Active") return "live";
+  if (status === "Planning") return "muted";
+  return "default";
+}
 
-const itemVariants = {
-  hidden: { y: 30, opacity: 0 },
-  visible: {
-    y: 0,
-    opacity: 1,
-    transition: { duration: 0.5, ease: 'easeOut' }
-  }
-};
-
-const HubCard = ({ item, categories }) => {
-  const isExternal = item.link.startsWith('http://') || item.link.startsWith('https://');
-  const isComingSoon = item.link === '#';
-  const statusColors = {
-    Live: 'bg-green-500', 
-    Beta: 'bg-blue-500',
-    Active: 'bg-purple-500',
-    Development: 'bg-yellow-500',
-    Planning: 'bg-gray-500'
-  };
-
-  const cardContent = (
-    <motion.div
-      variants={itemVariants}
-      whileHover={isComingSoon ? {} : { rotateX: 4, rotateY: -4, scale: 1.03 }}
-      whileTap={isComingSoon ? {} : { scale: 0.97 }}
-      className={`group relative ${isComingSoon ? 'cursor-default' : 'cursor-pointer'} h-full`}
-      style={{ perspective: '1000px' }}
-    >
-      {/* Glow halo */}
-      <div className={`absolute inset-0 rounded-xl opacity-0 ${isComingSoon ? '' : 'group-hover:opacity-100'} blur-xl transition-all duration-500 bg-gradient-to-r ${item.color}`} />
-      
-      <div className="relative bg-gray-900/60 backdrop-blur-md border border-gray-800 rounded-xl p-6 h-full shadow-lg flex flex-col">
-        {/* Status pulse */}
-        <div className="absolute top-4 right-4 flex items-center gap-2">
-          <span
-            className={`w-2 h-2 rounded-full ${
-              item.status !== 'Planning' ? 'animate-pulse' : ''
-            } ${statusColors[item.status]}`}
-          ></span>
-          <span className="text-xs text-gray-400">{item.status}</span>
-        </div>
-
-        {/* Icon */}
-        <div className="mb-4">
-          <div className={`w-14 h-14 rounded-lg bg-gradient-to-r ${item.color} flex items-center justify-center shadow-md p-2`}>
-            {item.iconType === 'image' ? (
-              <img
-                src={item.icon}
-                alt={item.iconLabel}
-                className="w-full h-full object-contain filter brightness-0 invert"
-                loading="lazy"
-              />
-            ) : (
-              <span role="img" aria-label={item.iconLabel} className="text-2xl">
-                {item.icon}
-              </span>
-            )}
+function HubCard({ item, categories }) {
+  const Icon = resolveIcon(item);
+  const isExternal = item.link?.startsWith("http://") || item.link?.startsWith("https://");
+  const isDisabled = !item.link || item.link === "#";
+  const preview = showcase[item.title] || showcase[item.title === "Portfolio" ? "Portfolio" : "byNolo Portfolio"];
+  const content = (
+    <article className="group h-full overflow-hidden rounded-[1.5rem] border border-white/10 bg-zinc-950/70 shadow-xl shadow-black/20 backdrop-blur transition hover:border-green-300/30 hover:bg-zinc-900/80">
+      <div className="aspect-[16/9] overflow-hidden border-b border-white/10 bg-zinc-900">
+        <img src={preview.image} alt={`${item.title} preview`} className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.025] group-hover:opacity-100" loading="lazy" />
+      </div>
+      <div className="p-5">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div className="grid h-11 w-11 place-items-center rounded-2xl border border-green-300/20 bg-green-300/10 text-green-300">
+            <Icon className="h-5 w-5" aria-hidden="true" />
           </div>
+          <Pill tone={statusTone(item.status)}>
+            {item.status === "Planning" ? <Clock3 className="h-3.5 w-3.5" aria-hidden="true" /> : <CircleDot className="h-3.5 w-3.5" aria-hidden="true" />}
+            {item.status}
+          </Pill>
         </div>
-
-        {/* Content */}
-        <div className="mb-4 flex-1">
-          <h3 className={`text-xl font-bold text-white ${isComingSoon ? '' : 'group-hover:text-green-400'} transition-colors mb-2`}>
-            {item.title}
-          </h3>
-          <p className="text-gray-400 text-sm leading-relaxed">{item.description}</p>
+        <h3 className="text-xl font-semibold text-white">{item.title}</h3>
+        <p className="mt-3 min-h-12 text-sm leading-6 text-zinc-400">{item.description}</p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          {item.categories?.map((categoryId) => (
+            <span key={categoryId} className="rounded-full bg-white/[0.04] px-3 py-1 text-xs text-zinc-400">
+              {categories[categoryId]?.name || categoryId}
+            </span>
+          ))}
         </div>
-
-        {/* Bottom section with categories and launch button */}
-        <div className="mt-auto space-y-3">
-          {/* Minimal category tags */}
-          <div className="flex flex-wrap gap-1">
-            {item.categories.map(categoryId => (
-              <span 
-                key={categoryId}
-                className="px-2 py-0.5 text-xs rounded bg-gray-800/50 text-gray-300 border border-gray-700/50"
-              >
-                {categories[categoryId].name}
-              </span>
-            ))}
-          </div>
-
-          {/* Launch button visual only */}
-          <div>
-            <div 
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg ${
-                isComingSoon 
-                  ? 'bg-gray-700 text-gray-400 cursor-not-allowed'
-                  : `bg-gradient-to-r ${item.color} text-white hover:shadow-lg`
-              } font-medium transition-all duration-300`}
-              aria-hidden="true"
-            >
-              {isComingSoon ? 'Coming Soon' : (isExternal ? 'Launch' : 'Visit')}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={
-                  isComingSoon 
-                    ? "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    : (isExternal ? "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" : "M9 5l7 7-7 7")
-                } />
-              </svg>
-            </div>
-          </div>
+        <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-green-300 transition group-hover:text-green-200">
+          {isDisabled ? "Coming soon" : isExternal ? "Launch service" : "Visit page"}
+          {!isDisabled && <ArrowUpRight className="h-4 w-4" aria-hidden="true" />}
         </div>
       </div>
-    </motion.div>
+    </article>
   );
 
-  // Wrap the entire card with appropriate link component
-  if (isComingSoon) {
-    // Coming soon items are not clickable
+  if (isDisabled) return content;
+  if (isExternal) {
     return (
-      <div className="block h-full">
-        {cardContent}
-      </div>
-    );
-  } else if (isExternal) {
-    return (
-      <a
-        href={item.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block h-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-gray-950 rounded-xl"
-      >
-        {cardContent}
+      <a href={item.link} target="_blank" rel="noopener noreferrer" className="block h-full">
+        {content}
       </a>
     );
-  } else {
-    return (
-      <Link 
-        to={item.link} 
-        className="block h-full focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 focus:ring-offset-gray-950 rounded-xl"
-      >
-        {cardContent}
-      </Link>
-    );
   }
-};
+  return (
+    <Link to={item.link} className="block h-full">
+      {content}
+    </Link>
+  );
+}
 
 export default function Hub() {
-  const [hubItems, setHubItems] = useState([]);
-  const [categories, setCategories] = useState(defaultCategories);
+  const [hubItems, setHubItems] = useState(fallbackHubItems);
+  const [categories, setCategories] = useState(categoryMeta);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState("all");
 
   useEffect(() => {
     const fetchHubData = async () => {
       try {
         setLoading(true);
-        
-        // Fetch hub items and categories
         const [itemsResponse, categoriesResponse] = await Promise.all([
           apiClient.getHubItems(),
-          apiClient.getHubCategories()
+          apiClient.getHubCategories(),
         ]);
-        
-        setHubItems(itemsResponse.items || []);
-        setCategories(categoriesResponse.categories || defaultCategories);
+
+        setHubItems(itemsResponse.items?.length ? itemsResponse.items : fallbackHubItems);
+        setCategories({ ...categoryMeta, ...(categoriesResponse.categories || {}) });
       } catch (err) {
-        console.error('Failed to fetch hub data:', err);
-        setError('Failed to load hub data. Please try again later.');
-        // Fallback to static data
-        setHubItems([
-          {
-            id: 1,
-            title: "Vinyl Vote",
-            description: "Weekly album voting platform",
-            icon: "🎵",
-            iconType: "emoji",
-            iconLabel: "Musical note",
-            link: "https://vinylvote.bynolo.com",
-            status: "Live",
-            categories: ["app", "service"],
-            color: "from-[#1DB954] to-[#1ED760]"
-          }
-        ]);
+        console.error("Failed to fetch hub data:", err);
+        setError("Live hub data is unavailable, so curated fallback services are shown.");
+        setHubItems(fallbackHubItems);
+        setCategories(categoryMeta);
       } finally {
         setLoading(false);
       }
@@ -281,121 +128,109 @@ export default function Hub() {
     fetchHubData();
   }, []);
 
-  // Compute filtered items and category counts (must be before any conditional returns)
-  const filteredItems = useMemo(() => {
-    return selectedCategory === 'all' ? hubItems : hubItems.filter(i => i.categories.includes(selectedCategory));
-  }, [selectedCategory, hubItems]);
-
-  const categoryCountMap = useMemo(() => {
-    const countMap = {};
-    
-    // Initialize all categories with 0
-    Object.values(categories).forEach(category => {
-      countMap[category.id] = 0;
-    });
-    
-    // Count items for each category
-    hubItems.forEach(item => {
-      item.categories.forEach(categoryId => {
-        if (countMap.hasOwnProperty(categoryId)) {
-          countMap[categoryId]++;
-        }
+  const counts = useMemo(() => {
+    const next = { all: hubItems.length };
+    hubItems.forEach((item) => {
+      item.categories?.forEach((category) => {
+        next[category] = (next[category] || 0) + 1;
       });
     });
-    
-    return countMap;
-  }, [hubItems, categories]);
+    return next;
+  }, [hubItems]);
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-400 mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading hub...</p>
-        </div>
-      </div>
-    );
-  }
+  const filteredItems = useMemo(() => {
+    if (selectedCategory === "all") return hubItems;
+    return hubItems.filter((item) => item.categories?.includes(selectedCategory));
+  }, [hubItems, selectedCategory]);
 
   return (
-    <div className="relative min-h-screen text-white pt-20 overflow-hidden">
-      {/* Background effects */}
-      <GradientMesh />
-      <AnimatedBackground />
-
-      {/* Hero */}
-      <motion.div
-        className="text-center mb-12 relative z-10 px-4"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-      >
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black mb-4">
-          Hub{' - '}
-          <span className="bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-transparent">
-            byNolo
-          </span>
-        </h1>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-          Your central command center for all byNolo services, tools, and projects.
-        </p>
-      </motion.div>
-
-      {/* Filter */}
-      <motion.div
-        className="flex flex-wrap justify-center gap-3 mb-12 relative z-10 px-4"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-      >
-        {/* All filter */}
-        <motion.button
-          onClick={() => setSelectedCategory('all')}
-          className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
-            selectedCategory === 'all'
-              ? 'bg-white text-gray-900 shadow-lg'
-              : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-          }`}
-        >
-          All
-        </motion.button>
-
-        {/* Category filters */}
-        {Object.values(categories).map(category => {
-          const categoryCount = categoryCountMap[category.id];
-          
-          return (
-            <motion.button
-              key={category.id}
-              onClick={() => setSelectedCategory(category.id)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
-                selectedCategory === category.id
-                  ? `bg-gradient-to-r ${category.color} text-white shadow-lg`
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
-              }`}
-              title={category.description}
-              aria-pressed={selectedCategory === category.id}
-            >
-              {category.name} ({categoryCount})
-            </motion.button>
-          );
-        })}
-      </motion.div>
-
-      {/* Grid */}
-      <motion.div
-        className="max-w-7xl mx-auto px-4 pb-20 relative z-10"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-          {filteredItems.map(item => (
-                              <HubCard key={item.id} item={item} categories={categories} />
-          ))}
+    <PageShell dense>
+      <section className="px-5 pb-12 pt-32 sm:px-8 lg:px-12 lg:pt-40">
+        <div className="mx-auto max-w-7xl">
+          <Pill tone="live">Command center</Pill>
+          <div className="mt-6 grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
+            <div>
+              <h1 className="text-5xl font-semibold leading-[0.98] text-white sm:text-6xl lg:text-7xl">The byNolo hub.</h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300">
+                A cleaner launch surface for the apps, services, sites, and tools that make up the byNolo ecosystem.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {[
+                [hubItems.length, "items"],
+                [counts.service || 0, "services"],
+                [counts.app || 0, "apps"],
+              ].map(([value, label]) => (
+                <div key={label} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+                  <div className="text-2xl font-semibold text-green-300">{value}</div>
+                  <div className="mt-1 text-xs uppercase tracking-[0.18em] text-zinc-500">{label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
-      </motion.div>
-    </div>
+      </section>
+
+      <section className="px-5 pb-20 sm:px-8 lg:px-12">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-8 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setSelectedCategory("all")}
+              className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                selectedCategory === "all" ? "border-green-300/40 bg-green-300/15 text-green-100" : "border-white/10 bg-white/[0.04] text-zinc-400 hover:text-white"
+              }`}
+            >
+              All ({counts.all || 0})
+            </button>
+            {Object.values(categories).map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => setSelectedCategory(category.id)}
+                title={category.description}
+                aria-pressed={selectedCategory === category.id}
+                className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                  selectedCategory === category.id ? "border-green-300/40 bg-green-300/15 text-green-100" : "border-white/10 bg-white/[0.04] text-zinc-400 hover:text-white"
+                }`}
+              >
+                {category.name} ({counts[category.id] || category.count || 0})
+              </button>
+            ))}
+          </div>
+
+          {loading ? (
+            <div className="flex items-center gap-3 rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6 text-zinc-300">
+              <Loader2 className="h-5 w-5 animate-spin text-green-300" aria-hidden="true" /> Loading hub services...
+            </div>
+          ) : (
+            <>
+              {error && <div className="mb-6 rounded-2xl border border-yellow-300/20 bg-yellow-300/10 p-4 text-sm text-yellow-100">{error}</div>}
+              {filteredItems.length === 0 ? (
+                <EmptyState title="No services in this category" copy="Try a different filter or check back when the next build goes live." />
+              ) : (
+                <div className="grid auto-rows-fr gap-6 md:grid-cols-2 xl:grid-cols-3">
+                  {filteredItems.map((item) => (
+                    <HubCard key={item.id || item.title} item={item} categories={categories} />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </section>
+
+      <section className="px-5 pb-20 sm:px-8 lg:px-12">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 rounded-[2rem] border border-green-300/20 bg-green-300/[0.06] p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.22em] text-green-300">Have an idea for the next tile?</p>
+            <h2 className="mt-3 text-3xl font-semibold text-white">Let’s make something worth launching.</h2>
+          </div>
+          <Link to="/contact" className="inline-flex items-center justify-center gap-2 rounded-full bg-green-400 px-5 py-3 text-sm font-semibold text-[#041008] transition hover:bg-green-300">
+            Start a build <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+    </PageShell>
   );
 }

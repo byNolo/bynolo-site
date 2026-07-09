@@ -1,0 +1,26 @@
+<svg width="1200" height="760" viewBox="0 0 1200 760" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="760" rx="42" fill="#08110E"/>
+  <rect x="48" y="48" width="1104" height="664" rx="30" fill="#0D1A16" stroke="#254536"/>
+  <rect x="92" y="96" width="1016" height="92" rx="24" fill="#101F1A"/>
+  <text x="132" y="151" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="850">KeyN Authentication</text>
+  <rect x="842" y="119" width="218" height="46" rx="23" fill="#153B29" stroke="#276B46"/>
+  <circle cx="874" cy="142" r="8" fill="#22C55E"/>
+  <text x="894" y="149" fill="#9CF2BC" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="700">Session healthy</text>
+  <rect x="92" y="236" width="420" height="384" rx="30" fill="#101F1A" stroke="#254536"/>
+  <path d="M247 384V335C247 295 273 268 312 268C351 268 377 295 377 335V384" stroke="#22C55E" stroke-width="22" stroke-linecap="round"/>
+  <rect x="209" y="371" width="206" height="166" rx="28" fill="#143323" stroke="#37D67A" stroke-width="4"/>
+  <circle cx="312" cy="444" r="20" fill="#9CF2BC"/>
+  <rect x="300" y="462" width="24" height="44" rx="12" fill="#9CF2BC"/>
+  <rect x="562" y="236" width="546" height="88" rx="24" fill="#101F1A" stroke="#254536"/>
+  <text x="598" y="271" fill="#8FB8A2" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700">LOGIN FLOW</text>
+  <text x="598" y="302" fill="#F8FAFC" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800">One auth layer across byNolo apps</text>
+  <rect x="562" y="356" width="252" height="126" rx="24" fill="#0E2118" stroke="#254536"/>
+  <text x="596" y="397" fill="#9CF2BC" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="900">JWT</text>
+  <text x="596" y="434" fill="#8FB8A2" font-family="Inter, Arial, sans-serif" font-size="18">token sessions</text>
+  <rect x="856" y="356" width="252" height="126" rx="24" fill="#0E2118" stroke="#254536"/>
+  <text x="890" y="397" fill="#9CF2BC" font-family="Inter, Arial, sans-serif" font-size="42" font-weight="900">SSO</text>
+  <text x="890" y="434" fill="#8FB8A2" font-family="Inter, Arial, sans-serif" font-size="18">service access</text>
+  <rect x="562" y="520" width="546" height="100" rx="24" fill="#0E2118" stroke="#254536"/>
+  <path d="M608 570H1046" stroke="#254536" stroke-width="16" stroke-linecap="round"/>
+  <path d="M608 570H903" stroke="#22C55E" stroke-width="16" stroke-linecap="round"/>
+</svg>
