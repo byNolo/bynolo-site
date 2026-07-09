@@ -73,7 +73,10 @@ export default function NavBar() {
           }`}
           aria-label="Primary navigation"
         >
-          <Link to="/" className="rounded-full pr-2 text-xl font-black tracking-normal text-green-400 transition hover:text-green-300">
+          <Link
+            to="/"
+            className="rounded-full pr-2 bg-gradient-to-r from-green-400 to-green-600 bg-clip-text text-xl font-bold text-transparent transition-all duration-300 hover:from-green-500 hover:to-green-700"
+          >
             byNolo
           </Link>
 
