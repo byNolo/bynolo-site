@@ -49,6 +49,12 @@ venv/bin/pip install -r requirements.txt
 venv/bin/python -m playwright install chromium
 ```
 
+On a headless Ubuntu server, Chromium may also need host libraries:
+
+```bash
+sudo apt-get install -y libnss3 libnspr4
+```
+
 Useful backend commands:
 
 ```bash

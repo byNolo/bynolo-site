@@ -76,7 +76,10 @@ def capture_screenshot(app, url, slug, full_page=True):
 
     try:
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.chromium.launch(
+                headless=True,
+                args=['--no-sandbox', '--disable-dev-shm-usage']
+            )
             page = browser.new_page(viewport={'width': 1440, 'height': 1000})
             page.goto(url, wait_until='networkidle', timeout=30000)
             page.screenshot(path=str(output_path), full_page=full_page)
