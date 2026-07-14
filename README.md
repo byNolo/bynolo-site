@@ -24,6 +24,41 @@ npm run prod
 - `npm run build` - Build for production
 - `npm run setup` - Initial setup
 
+## 🔧 Backend CMS
+
+The Flask backend now includes a protected content admin for V2 portfolio content:
+
+- Admin UI: `http://localhost:5000/admin`
+- Public API: `http://localhost:5000/api/*`
+- Screenshots: served from `/uploads/screenshots/<filename>`
+
+Important backend environment variables live in `api/.env`:
+
+```bash
+ADMIN_PASSWORD=change-this-admin-password
+SECRET_KEY=change-this-too
+UPLOAD_FOLDER=instance/uploads
+DATABASE_URL=sqlite:///bynolo.db
+```
+
+After backend dependency install, install the screenshot browser once:
+
+```bash
+cd api
+venv/bin/pip install -r requirements.txt
+venv/bin/python -m playwright install chromium
+```
+
+Useful backend commands:
+
+```bash
+cd api
+FLASK_APP=run.py venv/bin/flask db upgrade -d migrations
+FLASK_APP=run.py venv/bin/flask seed-v2-content
+FLASK_APP=run.py venv/bin/flask refresh-screenshots
+FLASK_APP=run.py venv/bin/flask check-links
+```
+
 ## 🌐 Deployment
 
 For Cloudflare Tunnel:

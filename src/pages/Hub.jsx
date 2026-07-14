@@ -50,10 +50,11 @@ function HubCard({ item, categories }) {
   const isExternal = item.link?.startsWith("http://") || item.link?.startsWith("https://");
   const isDisabled = !item.link || item.link === "#";
   const preview = showcase[item.title] || showcase[item.title === "Portfolio" ? "Portfolio" : "byNolo Portfolio"];
+  const previewImage = item.screenshot_url || item.showcase_image_url || preview.image;
   const content = (
     <article className="group h-full overflow-hidden rounded-[1.5rem] border border-white/10 bg-zinc-950/70 shadow-xl shadow-black/20 backdrop-blur transition hover:border-green-300/30 hover:bg-zinc-900/80">
       <div className="aspect-[16/9] overflow-hidden border-b border-white/10 bg-zinc-900">
-        <img src={preview.image} alt={`${item.title} preview`} className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.025] group-hover:opacity-100" loading="lazy" />
+        <img src={previewImage} alt={`${item.title} preview`} className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.025] group-hover:opacity-100" loading="lazy" />
       </div>
       <div className="p-5">
         <div className="mb-5 flex items-start justify-between gap-4">
@@ -66,7 +67,7 @@ function HubCard({ item, categories }) {
           </Pill>
         </div>
         <h3 className="text-xl font-semibold text-white">{item.title}</h3>
-        <p className="mt-3 min-h-12 text-sm leading-6 text-zinc-400">{item.description}</p>
+        <p className="mt-3 min-h-12 text-sm leading-6 text-zinc-400">{item.impact || item.description}</p>
         <div className="mt-5 flex flex-wrap gap-2">
           {item.categories?.map((categoryId) => (
             <span key={categoryId} className="rounded-full bg-white/[0.04] px-3 py-1 text-xs text-zinc-400">

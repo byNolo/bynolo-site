@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from .models import db, Project, ContactSubmission, SiteStats, HubItem
+from .models import db, Project, ContactSubmission, SiteStats, HubItem, Category, SiteSetting
 from datetime import datetime
 import re
 
@@ -15,7 +15,10 @@ def validate_email(email):
 def get_projects():
     """Get all projects for the portfolio"""
     try:
-        projects = Project.query.filter(Project.featured == True).order_by(Project.order_index.asc(), Project.created_at.desc()).all()
+        projects = Project.query.filter(
+            Project.featured == True,
+            Project.visibility != 'archived'
+        ).order_by(Project.order_index.asc(), Project.created_at.desc()).all()
         projects_data = [project.to_dict() for project in projects]
         return jsonify({'projects': projects_data, 'count': len(projects_data)})
     except Exception as e:
@@ -40,8 +43,8 @@ def get_hub_items():
         
         query = HubItem.query
         
-        # Only show featured items
-        query = query.filter(HubItem.featured == True)
+        # Only show featured, non-archived items
+        query = query.filter(HubItem.featured == True, HubItem.visibility != 'archived')
         
         if category_filter:
             # Filter by category (requires JSON search)
@@ -86,41 +89,19 @@ def get_hub_categories():
             for category in categories:
                 category_counts[category] = category_counts.get(category, 0) + 1
         
-        # Define category metadata
-        category_info = {
-            'service': {
-                'id': 'service',
-                'name': 'Services',
-                'description': 'Core infrastructure and APIs',
-                'color': 'from-blue-500 to-blue-600'
-            },
-            'app': {
-                'id': 'app', 
-                'name': 'Applications',
-                'description': 'Full-featured web applications',
-                'color': 'from-purple-500 to-purple-600'
-            },
-            'site': {
-                'id': 'site',
-                'name': 'Websites',
-                'description': 'Marketing and portfolio sites',
-                'color': 'from-green-500 to-green-600'
-            },
-            'tool': {
-                'id': 'tool',
-                'name': 'Tools',
-                'description': 'Development and utility tools',
-                'color': 'from-yellow-500 to-yellow-600'
-            }
+        category_rows = Category.query.filter(Category.featured == True).order_by(Category.order_index.asc(), Category.name.asc()).all()
+        if not category_rows:
+            category_rows = [
+                Category(slug='service', name='Services', description='Core infrastructure and APIs', color='from-blue-500 to-blue-600'),
+                Category(slug='app', name='Applications', description='Full-featured web applications', color='from-purple-500 to-purple-600'),
+                Category(slug='site', name='Websites', description='Marketing and portfolio sites', color='from-green-500 to-green-600'),
+                Category(slug='tool', name='Tools', description='Development and utility tools', color='from-yellow-500 to-yellow-600'),
+            ]
+
+        categories = {
+            category.slug: category.to_dict(count=category_counts.get(category.slug, 0))
+            for category in category_rows
         }
-        
-        # Combine counts with metadata
-        categories = {}
-        for cat_id, info in category_info.items():
-            categories[cat_id] = {
-                **info,
-                'count': category_counts.get(cat_id, 0)
-            }
         
         return jsonify({'categories': categories})
     except Exception as e:
@@ -193,3 +174,15 @@ def get_stats():
         return jsonify(response_stats)
     except Exception as e:
         return jsonify({'error': 'Failed to fetch statistics'}), 500
+
+
+@api_bp.route('/site-settings', methods=['GET'])
+def get_site_settings():
+    """Get public site settings"""
+    try:
+        settings = SiteSetting.query.order_by(SiteSetting.key.asc()).all()
+        return jsonify({
+            'settings': {setting.key: setting.to_dict() for setting in settings}
+        })
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch site settings'}), 500

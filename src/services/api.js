@@ -52,6 +52,10 @@ class ApiClient {
     return this.request('/api/stats');
   }
 
+  async getSiteSettings() {
+    return this.request('/api/site-settings');
+  }
+
   // Hub API
   async getHubItems(filters = {}) {
     const params = new URLSearchParams();
@@ -89,5 +93,6 @@ export const {
   getHubItems,
   getHubItem,
   getHubCategories,
+  getSiteSettings,
   healthCheck
 } = apiClient;

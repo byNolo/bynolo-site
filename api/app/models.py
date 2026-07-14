@@ -22,6 +22,19 @@ class Project(db.Model):
     icon = db.Column(db.String(500))  # Emoji or URL
     icon_type = db.Column(db.String(20), default='emoji')  # emoji or image
     icon_label = db.Column(db.String(200))
+    slug = db.Column(db.String(220), unique=True, index=True)
+    kicker = db.Column(db.String(200))
+    impact = db.Column(db.Text)
+    accent = db.Column(db.String(50), default='green')
+    showcase_image_url = db.Column(db.String(500))
+    screenshot_url = db.Column(db.String(500))
+    screenshot_status = db.Column(db.String(50), default='unknown')
+    screenshot_captured_at = db.Column(db.DateTime)
+    screenshot_error = db.Column(db.Text)
+    visibility = db.Column(db.String(50), default='public')
+    health_status = db.Column(db.String(50), default='unknown')
+    health_checked_at = db.Column(db.DateTime)
+    health_error = db.Column(db.Text)
     
     def get_tech_stack(self):
         """Get tech stack as a list"""
@@ -48,6 +61,19 @@ class Project(db.Model):
             'icon': self.icon,
             'iconType': self.icon_type,
             'iconLabel': self.icon_label,
+            'slug': self.slug,
+            'kicker': self.kicker,
+            'impact': self.impact,
+            'accent': self.accent,
+            'showcase_image_url': self.showcase_image_url,
+            'screenshot_url': self.screenshot_url,
+            'screenshot_status': self.screenshot_status,
+            'screenshot_captured_at': self.screenshot_captured_at.isoformat() if self.screenshot_captured_at else None,
+            'screenshot_error': self.screenshot_error,
+            'visibility': self.visibility,
+            'health_status': self.health_status,
+            'health_checked_at': self.health_checked_at.isoformat() if self.health_checked_at else None,
+            'health_error': self.health_error,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
@@ -74,6 +100,19 @@ class HubItem(db.Model):
     featured = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    slug = db.Column(db.String(220), unique=True, index=True)
+    kicker = db.Column(db.String(200))
+    impact = db.Column(db.Text)
+    accent = db.Column(db.String(50), default='green')
+    showcase_image_url = db.Column(db.String(500))
+    screenshot_url = db.Column(db.String(500))
+    screenshot_status = db.Column(db.String(50), default='unknown')
+    screenshot_captured_at = db.Column(db.DateTime)
+    screenshot_error = db.Column(db.Text)
+    visibility = db.Column(db.String(50), default='public')
+    health_status = db.Column(db.String(50), default='unknown')
+    health_checked_at = db.Column(db.DateTime)
+    health_error = db.Column(db.Text)
     
     def get_categories(self):
         """Get categories as a list"""
@@ -100,6 +139,19 @@ class HubItem(db.Model):
             'categories': self.get_categories(),
             'color': self.color,
             'featured': self.featured,
+            'slug': self.slug,
+            'kicker': self.kicker,
+            'impact': self.impact,
+            'accent': self.accent,
+            'showcase_image_url': self.showcase_image_url,
+            'screenshot_url': self.screenshot_url,
+            'screenshot_status': self.screenshot_status,
+            'screenshot_captured_at': self.screenshot_captured_at.isoformat() if self.screenshot_captured_at else None,
+            'screenshot_error': self.screenshot_error,
+            'visibility': self.visibility,
+            'health_status': self.health_status,
+            'health_checked_at': self.health_checked_at.isoformat() if self.health_checked_at else None,
+            'health_error': self.health_error,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
@@ -159,3 +211,59 @@ class SiteStats(db.Model):
     
     def __repr__(self):
         return f'<SiteStats {self.key}: {self.value}>'
+
+
+class Category(db.Model):
+    """Editable metadata for project and hub categories"""
+    __tablename__ = 'categories'
+
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(80), unique=True, nullable=False, index=True)
+    name = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.String(300))
+    color = db.Column(db.String(120), default='from-green-400 to-green-600')
+    order_index = db.Column(db.Integer, default=0)
+    featured = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self, count=0):
+        return {
+            'id': self.slug,
+            'slug': self.slug,
+            'name': self.name,
+            'description': self.description,
+            'color': self.color,
+            'order_index': self.order_index,
+            'featured': self.featured,
+            'count': count,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+    def __repr__(self):
+        return f'<Category {self.slug}>'
+
+
+class SiteSetting(db.Model):
+    """Editable key/value site settings for public copy and configuration"""
+    __tablename__ = 'site_settings'
+
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    value = db.Column(db.Text)
+    value_type = db.Column(db.String(40), default='text')
+    description = db.Column(db.String(300))
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'key': self.key,
+            'value': self.value,
+            'value_type': self.value_type,
+            'description': self.description,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
+
+    def __repr__(self):
+        return f'<SiteSetting {self.key}>'

@@ -32,6 +32,7 @@ export default function Projects() {
 
   const leadProject = projects[0] || fallbackProjects[0];
   const leadMeta = showcase[leadProject.title] || showcase.Portfolio;
+  const leadImage = leadProject.screenshot_url || leadProject.showcase_image_url || leadMeta.image;
 
   return (
     <PageShell dense>
@@ -70,9 +71,9 @@ export default function Projects() {
               <ShowcaseCard
                 item={leadProject}
                 href={leadProject.live_url || leadProject.github_url}
-                image={leadMeta.image}
-                kicker={leadMeta.kicker}
-                impact={leadMeta.impact}
+                image={leadImage}
+                kicker={leadProject.kicker || leadMeta.kicker}
+                impact={leadProject.impact || leadMeta.impact}
                 tags={leadProject.tech_stack}
                 status={leadProject.status}
               />
@@ -90,14 +91,15 @@ export default function Projects() {
               <div className="grid gap-6 md:grid-cols-2">
                 {projects.slice(1).map((project) => {
                   const meta = showcase[project.title] || showcase.Portfolio;
+                  const image = project.screenshot_url || project.showcase_image_url || meta.image;
                   return (
                     <ShowcaseCard
                       key={project.id || project.title}
                       item={project}
                       href={project.live_url || project.github_url}
-                      image={meta.image}
-                      kicker={meta.kicker}
-                      impact={meta.impact}
+                      image={image}
+                      kicker={project.kicker || meta.kicker}
+                      impact={project.impact || meta.impact}
                       tags={project.tech_stack}
                       status={project.status}
                     />

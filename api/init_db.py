@@ -9,7 +9,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from app import create_app
-from app.models import db, Project, SiteStats, HubItem
+from app.models import db, Project, SiteStats, HubItem, Category, SiteSetting
 from datetime import datetime
 
 def init_db():
@@ -27,43 +27,59 @@ def init_db():
             projects_data = [
                 {
                     'title': 'byNolo Portfolio',
-                    'description': 'A sleek, modern personal site to showcase all my projects. Built with Vite, Tailwind, and React, with dark mode and smooth animations.',
+                    'slug': 'bynolo-portfolio',
+                    'description': 'A dark-first portfolio and project hub for byNolo work, experiments, and collaboration.',
                     'tech_stack': ['React', 'Vite', 'Tailwind', 'Framer Motion'],
                     'github_url': 'https://github.com/byNolo/bynolo-site',
                     'live_url': 'https://bynolo.com',
                     'featured': True,
                     'status': 'Active',
-                    'order_index': 1
+                    'order_index': 4,
+                    'kicker': 'Studio home base',
+                    'impact': 'The public front door for work, services, experiments, and contact.',
+                    'showcase_image_url': '/showcase/portfolio.svg'
                 },
                 {
                     'title': 'KeyN Authentication',
-                    'description': 'Custom authentication system powering login across all byNolo projects. Secure, self-hosted, with session and JWT support.',
+                    'slug': 'keyn-authentication',
+                    'description': 'A custom authentication service for shared login, sessions, and identity across byNolo projects.',
                     'tech_stack': ['Auth', 'JWT', 'OAuth2', 'Flask', 'Security'],
                     'github_url': 'https://github.com/byNolo/keyn',
-                    'live_url': None,
+                    'live_url': 'https://keyn.bynolo.com',
                     'featured': True,
                     'status': 'Active',
-                    'order_index': 2
+                    'order_index': 2,
+                    'kicker': 'Shared identity layer',
+                    'impact': 'A self-hosted auth backbone for the byNolo ecosystem.',
+                    'showcase_image_url': '/showcase/keyn.svg'
                 },
                 {
                     'title': 'SideQuest',
-                    'description': 'Gamified daily side quest generator. Personalized quests based on location, preferences, and community ratings.',
+                    'slug': 'sidequest',
+                    'description': 'A gamified local discovery platform for turning daily routines into small, trackable adventures.',
                     'tech_stack': ['Flask', 'Gamification', 'Geo', 'Automation'],
-                    'github_url': '#',
-                    'live_url': None,
-                    'featured': False,
+                    'github_url': '',
+                    'live_url': 'https://sidequest.bynolo.com',
+                    'featured': True,
                     'status': 'Planning',
-                    'order_index': 3
+                    'order_index': 3,
+                    'kicker': 'Location-aware game layer',
+                    'impact': 'A planning-stage quest engine for daily adventure and discovery.',
+                    'showcase_image_url': '/showcase/sidequest.svg'
                 },
                 {
                     'title': 'Vinyl Vote',
-                    'description': 'A weekly album rating platform for my friend group. Features user login, stats, charts, and admin dashboard.',
-                    'tech_stack': ['Flask', 'Music', 'Voting', 'Charts'],
+                    'slug': 'vinyl-vote',
+                    'description': 'A weekly album voting platform for friend groups with listening rooms, rankings, and simple admin tools.',
+                    'tech_stack': ['Flask', 'React', 'Charts', 'Auth'],
                     'github_url': 'https://github.com/byNolo/vinyl-vote',
-                    'live_url': None,
+                    'live_url': 'https://vinylvote.bynolo.com',
                     'featured': True,
                     'status': 'Active',
-                    'order_index': 4
+                    'order_index': 1,
+                    'kicker': 'Social music platform',
+                    'impact': 'Weekly album rooms, voting, charts, and a shared reason to listen.',
+                    'showcase_image_url': '/showcase/vinyl-vote.svg'
                 }
             ]
             
@@ -75,7 +91,13 @@ def init_db():
                     live_url=project_data['live_url'],
                     featured=project_data['featured'],
                     status=project_data['status'],
-                    order_index=project_data['order_index']
+                    order_index=project_data['order_index'],
+                    slug=project_data['slug'],
+                    kicker=project_data['kicker'],
+                    impact=project_data['impact'],
+                    showcase_image_url=project_data['showcase_image_url'],
+                    visibility='public',
+                    accent='green'
                 )
                 project.set_tech_stack(project_data['tech_stack'])
                 db.session.add(project)
@@ -109,60 +131,91 @@ def init_db():
         else:
             print("📊 Statistics already exist in database")
         
+        # Check if categories already exist
+        if Category.query.count() == 0:
+            categories_data = [
+                {'slug': 'service', 'name': 'Services', 'description': 'Infrastructure, APIs, and shared systems', 'order_index': 1},
+                {'slug': 'app', 'name': 'Apps', 'description': 'Full product experiences and tools', 'order_index': 2},
+                {'slug': 'site', 'name': 'Sites', 'description': 'Websites, portfolios, and public surfaces', 'order_index': 3},
+                {'slug': 'tool', 'name': 'Tools', 'description': 'Utilities, automations, and experiments', 'order_index': 4},
+            ]
+            for category_data in categories_data:
+                db.session.add(Category(**category_data, color='from-green-400 to-green-600', featured=True))
+            db.session.commit()
+            print(f"✅ Added {len(categories_data)} categories to database")
+        else:
+            print("🏷️ Categories already exist in database")
+
         # Check if hub items already exist
         if HubItem.query.count() == 0:
             hub_items_data = [
                 {
                     'title': 'Vinyl Vote',
-                    'description': 'Weekly album voting platform',
-                    'icon': '🎵',
-                    'icon_type': 'emoji',
-                    'icon_label': 'Musical note',
+                    'slug': 'vinyl-vote',
+                    'description': 'Weekly album voting platform for listening rooms and shared music rituals.',
+                    'icon': 'Music',
+                    'icon_type': 'lucide',
+                    'icon_label': 'Music icon',
                     'link': 'https://vinylvote.bynolo.com',
                     'status': 'Live',
                     'categories': ['app', 'service'],
-                    'color': 'from-[#1DB954] to-[#1ED760]',
+                    'color': 'from-emerald-400 to-green-500',
                     'order_index': 1,
-                    'featured': True
+                    'featured': True,
+                    'kicker': 'Social music platform',
+                    'impact': 'Weekly album rooms, voting, charts, and a shared reason to listen.',
+                    'showcase_image_url': '/showcase/vinyl-vote.svg'
                 },
                 {
                     'title': 'KeyN Authentication',
-                    'description': 'Secure authentication system powering all byNolo projects',
-                    'icon': '🔐',
-                    'icon_type': 'emoji', 
-                    'icon_label': 'Lock representing security',
+                    'slug': 'keyn-authentication',
+                    'description': 'Secure authentication system powering byNolo logins and shared sessions.',
+                    'icon': 'ShieldCheck',
+                    'icon_type': 'lucide',
+                    'icon_label': 'Shield icon',
                     'link': 'https://keyn.bynolo.com',
                     'status': 'Live',
                     'categories': ['service'],
-                    'color': 'from-blue-500 to-blue-600',
+                    'color': 'from-green-400 to-teal-400',
                     'order_index': 2,
-                    'featured': True
+                    'featured': True,
+                    'kicker': 'Shared identity layer',
+                    'impact': 'A self-hosted auth backbone for the byNolo ecosystem.',
+                    'showcase_image_url': '/showcase/keyn.svg'
                 },
                 {
                     'title': 'Portfolio',
-                    'description': 'This site - showcasing projects and serving as the central hub',
-                    'icon': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
-                    'icon_type': 'image',
-                    'icon_label': 'React logo',
+                    'slug': 'portfolio',
+                    'description': 'The central studio site for projects, services, and contact.',
+                    'icon': 'PanelsTopLeft',
+                    'icon_type': 'lucide',
+                    'icon_label': 'Interface icon',
                     'link': '/',
                     'status': 'Active',
                     'categories': ['site'],
-                    'color': 'from-green-500 to-green-600',
+                    'color': 'from-lime-300 to-green-500',
                     'order_index': 3,
-                    'featured': True
+                    'featured': True,
+                    'kicker': 'Studio home base',
+                    'impact': 'The public front door for work, services, experiments, and contact.',
+                    'showcase_image_url': '/showcase/portfolio.svg'
                 },
                 {
                     'title': 'SideQuest',
+                    'slug': 'sidequest',
                     'description': 'Gamified daily adventures and local discovery platform',
-                    'icon': '🗺️',
-                    'icon_type': 'emoji',
-                    'icon_label': 'Map representing adventure',
+                    'icon': 'Map',
+                    'icon_type': 'lucide',
+                    'icon_label': 'Map icon',
                     'link': 'https://sidequest.bynolo.com',
                     'status': 'Planning',
                     'categories': ['app', 'tool'],
-                    'color': 'from-purple-500 to-purple-600',
+                    'color': 'from-green-300 to-emerald-500',
                     'order_index': 4,
-                    'featured': False
+                    'featured': True,
+                    'kicker': 'Location-aware game layer',
+                    'impact': 'A planning-stage quest engine for daily adventure and discovery.',
+                    'showcase_image_url': '/showcase/sidequest.svg'
                 }
             ]
             
@@ -177,7 +230,13 @@ def init_db():
                     status=item_data['status'],
                     color=item_data['color'],
                     order_index=item_data['order_index'],
-                    featured=item_data['featured']
+                    featured=item_data['featured'],
+                    slug=item_data['slug'],
+                    kicker=item_data['kicker'],
+                    impact=item_data['impact'],
+                    showcase_image_url=item_data['showcase_image_url'],
+                    visibility='public',
+                    accent='green'
                 )
                 item.set_categories(item_data['categories'])
                 db.session.add(item)
@@ -186,6 +245,18 @@ def init_db():
             print(f"✅ Added {len(hub_items_data)} hub items to database")
         else:
             print("🎯 Hub items already exist in database")
+
+        if SiteSetting.query.count() == 0:
+            settings_data = [
+                {'key': 'brand_name', 'value': 'byNolo', 'value_type': 'text', 'description': 'Public brand name'},
+                {'key': 'admin_notes', 'value': 'Use /admin to manage portfolio content and screenshots.', 'value_type': 'text', 'description': 'Internal admin note'},
+            ]
+            for setting_data in settings_data:
+                db.session.add(SiteSetting(**setting_data))
+            db.session.commit()
+            print(f"✅ Added {len(settings_data)} site settings")
+        else:
+            print("⚙️ Site settings already exist in database")
         
         print("\n🎉 Database initialization completed successfully!")
         print(f"📍 Database location: {app.config['SQLALCHEMY_DATABASE_URI']}")
