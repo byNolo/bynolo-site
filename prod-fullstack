@@ -71,6 +71,11 @@ else
 fi
 
 echo "✅ Starting frontend server (port $FRONTEND_PORT)"
+for pid in $(lsof -t -i :$FRONTEND_PORT 2>/dev/null); do
+    echo "⚠️  Port $FRONTEND_PORT is busy; stopping process $pid before starting frontend..."
+    kill "$pid" 2>/dev/null || true
+done
+
 echo ""
 echo "🌐 Frontend: http://localhost:$FRONTEND_PORT"
 echo "🔧 Backend:  http://localhost:$BACKEND_PORT"
