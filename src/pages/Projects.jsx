@@ -5,10 +5,13 @@ import PageShell from "../components/PageShell";
 import Section from "../components/Section";
 import { EmptyState, ProjectLinks, ShowcaseCard } from "../components/ui";
 import apiClient from "../services/api";
-import { fallbackProjects, showcase } from "../data/siteContent";
+
+function imageFor(project) {
+  return project?.screenshot_url || project?.showcase_image_url || null;
+}
 
 export default function Projects() {
-  const [projects, setProjects] = useState(fallbackProjects);
+  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,11 +20,11 @@ export default function Projects() {
       try {
         setLoading(true);
         const response = await apiClient.getProjects();
-        setProjects(response.projects?.length ? response.projects : fallbackProjects);
+        setProjects(response.projects || []);
       } catch (err) {
         console.error("Failed to fetch projects:", err);
-        setError("Live project data is unavailable, so a curated snapshot is shown.");
-        setProjects(fallbackProjects);
+        setError("Project data is temporarily unavailable.");
+        setProjects([]);
       } finally {
         setLoading(false);
       }
@@ -30,9 +33,7 @@ export default function Projects() {
     fetchProjects();
   }, []);
 
-  const leadProject = projects[0] || fallbackProjects[0];
-  const leadMeta = showcase[leadProject.title] || showcase.Portfolio;
-  const leadImage = leadProject.screenshot_url || leadProject.showcase_image_url || leadMeta.image;
+  const leadProject = projects[0];
 
   return (
     <PageShell dense>
@@ -67,45 +68,43 @@ export default function Projects() {
           <>
             {error && <div className="mb-6 rounded-2xl border border-yellow-300/20 bg-yellow-300/10 p-4 text-sm text-yellow-100">{error}</div>}
 
-            <div className="mb-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-              <ShowcaseCard
-                item={leadProject}
-                href={leadProject.live_url || leadProject.github_url}
-                image={leadImage}
-                kicker={leadProject.kicker || leadMeta.kicker}
-                impact={leadProject.impact || leadMeta.impact}
-                tags={leadProject.tech_stack}
-                status={leadProject.status}
-              />
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-green-300">Featured build</p>
-                <h2 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">{leadProject.title}</h2>
-                <p className="mt-4 text-base leading-7 text-zinc-300">{leadProject.description}</p>
-                <ProjectLinks github={leadProject.github_url} live={leadProject.live_url} />
-              </div>
-            </div>
-
             {projects.length === 0 ? (
               <EmptyState title="No projects found" copy="There is no featured work to show right now." />
             ) : (
-              <div className="grid gap-6 md:grid-cols-2">
-                {projects.slice(1).map((project) => {
-                  const meta = showcase[project.title] || showcase.Portfolio;
-                  const image = project.screenshot_url || project.showcase_image_url || meta.image;
-                  return (
+              <>
+                <div className="mb-12 grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+                  <ShowcaseCard
+                    item={leadProject}
+                    href={leadProject.live_url || leadProject.github_url}
+                    image={imageFor(leadProject)}
+                    kicker={leadProject.kicker}
+                    impact={leadProject.impact}
+                    tags={leadProject.tech_stack}
+                    status={leadProject.status}
+                  />
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.28em] text-green-300">Featured build</p>
+                    <h2 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">{leadProject.title}</h2>
+                    <p className="mt-4 text-base leading-7 text-zinc-300">{leadProject.description}</p>
+                    <ProjectLinks github={leadProject.github_url} live={leadProject.live_url} />
+                  </div>
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-2">
+                  {projects.slice(1).map((project) => (
                     <ShowcaseCard
                       key={project.id || project.title}
                       item={project}
                       href={project.live_url || project.github_url}
-                      image={image}
-                      kicker={project.kicker || meta.kicker}
-                      impact={project.impact || meta.impact}
+                      image={imageFor(project)}
+                      kicker={project.kicker}
+                      impact={project.impact}
                       tags={project.tech_stack}
                       status={project.status}
                     />
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              </>
             )}
           </>
         )}

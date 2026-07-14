@@ -15,9 +15,8 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import PageShell from "../components/PageShell";
-import { EmptyState, Pill } from "../components/ui";
+import { EmptyState, InterfacePreview, Pill } from "../components/ui";
 import apiClient from "../services/api";
-import { categoryMeta, fallbackHubItems, showcase } from "../data/siteContent";
 
 const iconMap = {
   Music,
@@ -49,12 +48,11 @@ function HubCard({ item, categories }) {
   const Icon = resolveIcon(item);
   const isExternal = item.link?.startsWith("http://") || item.link?.startsWith("https://");
   const isDisabled = !item.link || item.link === "#";
-  const preview = showcase[item.title] || showcase[item.title === "Portfolio" ? "Portfolio" : "byNolo Portfolio"];
-  const previewImage = item.screenshot_url || item.showcase_image_url || preview.image;
+  const previewImage = item.screenshot_url || item.showcase_image_url || null;
   const content = (
     <article className="group h-full overflow-hidden rounded-[1.5rem] border border-white/10 bg-zinc-950/70 shadow-xl shadow-black/20 backdrop-blur transition hover:border-green-300/30 hover:bg-zinc-900/80">
       <div className="aspect-[16/9] overflow-hidden border-b border-white/10 bg-zinc-900">
-        <img src={previewImage} alt={`${item.title} preview`} className="h-full w-full object-cover opacity-90 transition duration-700 group-hover:scale-[1.025] group-hover:opacity-100" loading="lazy" />
+        <InterfacePreview image={previewImage} title={item.title} className="opacity-90 group-hover:opacity-100" />
       </div>
       <div className="p-5">
         <div className="mb-5 flex items-start justify-between gap-4">
@@ -99,8 +97,8 @@ function HubCard({ item, categories }) {
 }
 
 export default function Hub() {
-  const [hubItems, setHubItems] = useState(fallbackHubItems);
-  const [categories, setCategories] = useState(categoryMeta);
+  const [hubItems, setHubItems] = useState([]);
+  const [categories, setCategories] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -114,13 +112,13 @@ export default function Hub() {
           apiClient.getHubCategories(),
         ]);
 
-        setHubItems(itemsResponse.items?.length ? itemsResponse.items : fallbackHubItems);
-        setCategories({ ...categoryMeta, ...(categoriesResponse.categories || {}) });
+        setHubItems(itemsResponse.items || []);
+        setCategories(categoriesResponse.categories || {});
       } catch (err) {
         console.error("Failed to fetch hub data:", err);
-        setError("Live hub data is unavailable, so a curated snapshot is shown.");
-        setHubItems(fallbackHubItems);
-        setCategories(categoryMeta);
+        setError("Hub data is temporarily unavailable.");
+        setHubItems([]);
+        setCategories({});
       } finally {
         setLoading(false);
       }

@@ -21,6 +21,7 @@ def create_app():
     app.config['SESSION_COOKIE_SAMESITE'] = os.getenv('SESSION_COOKIE_SAMESITE', 'Lax')
     app.config['SESSION_COOKIE_SECURE'] = os.getenv('SESSION_COOKIE_SECURE', 'False').lower() == 'true'
     app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', os.path.join(app.instance_path, 'uploads'))
+    app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_UPLOAD_MB', '8')) * 1024 * 1024
     
     # Database configuration
     database_url = os.getenv('DATABASE_URL', 'sqlite:///bynolo.db')
@@ -113,13 +114,109 @@ def register_cli(app):
     @app.cli.command('seed-v2-content')
     def seed_v2_content():
         """Backfill V2 categories and settings when upgrading an existing database."""
-        from .models import db, Category, SiteSetting
+        from .models import db, Category, SiteSetting, Project, HubItem
 
         categories = [
             ('service', 'Services', 'Infrastructure, APIs, and shared systems', 1),
             ('app', 'Apps', 'Full product experiences and tools', 2),
             ('site', 'Sites', 'Websites, portfolios, and public surfaces', 3),
             ('tool', 'Tools', 'Utilities, automations, and experiments', 4),
+        ]
+        project_defaults = {
+            'Vinyl Vote': {
+                'slug': 'vinyl-vote',
+                'kicker': 'Social music platform',
+                'impact': 'Weekly album rooms, voting, charts, and a shared reason to listen.',
+                'showcase_image_url': '/showcase/vinyl-vote.svg',
+                'accent': 'green',
+                'order_index': 1,
+            },
+            'KeyN Authentication': {
+                'slug': 'keyn-authentication',
+                'kicker': 'Shared identity layer',
+                'impact': 'A self-hosted auth backbone for the byNolo ecosystem.',
+                'showcase_image_url': '/showcase/keyn.svg',
+                'accent': 'emerald',
+                'order_index': 2,
+            },
+            'SideQuest': {
+                'slug': 'sidequest',
+                'kicker': 'Location-aware game layer',
+                'impact': 'A planning-stage quest engine for daily adventure and discovery.',
+                'showcase_image_url': '/showcase/sidequest.svg',
+                'accent': 'lime',
+                'order_index': 3,
+            },
+            'byNolo Portfolio': {
+                'slug': 'bynolo-portfolio',
+                'kicker': 'Studio home base',
+                'impact': 'The public front door for work, services, experiments, and contact.',
+                'showcase_image_url': '/showcase/portfolio.svg',
+                'accent': 'green',
+                'order_index': 4,
+            },
+        }
+        hub_defaults = [
+            {
+                'title': 'Vinyl Vote',
+                'description': 'Weekly album voting platform for listening rooms and shared music rituals.',
+                'slug': 'vinyl-vote',
+                'kicker': 'Social music platform',
+                'impact': 'Weekly album rooms, voting, charts, and a shared reason to listen.',
+                'icon': 'Music',
+                'icon_type': 'lucide',
+                'icon_label': 'Music icon',
+                'link': 'https://vinylvote.bynolo.com',
+                'status': 'Live',
+                'categories': ['app', 'service'],
+                'showcase_image_url': '/showcase/vinyl-vote.svg',
+                'order_index': 1,
+            },
+            {
+                'title': 'KeyN Authentication',
+                'description': 'Secure authentication system powering byNolo logins and shared sessions.',
+                'slug': 'keyn-authentication',
+                'kicker': 'Shared identity layer',
+                'impact': 'A self-hosted auth backbone for the byNolo ecosystem.',
+                'icon': 'ShieldCheck',
+                'icon_type': 'lucide',
+                'icon_label': 'Shield icon',
+                'link': 'https://keyn.bynolo.com',
+                'status': 'Live',
+                'categories': ['service'],
+                'showcase_image_url': '/showcase/keyn.svg',
+                'order_index': 2,
+            },
+            {
+                'title': 'Portfolio',
+                'description': 'The central studio site for projects, services, and contact.',
+                'slug': 'portfolio',
+                'kicker': 'Studio home base',
+                'impact': 'The public front door for work, services, experiments, and contact.',
+                'icon': 'PanelsTopLeft',
+                'icon_type': 'lucide',
+                'icon_label': 'Interface icon',
+                'link': '/',
+                'status': 'Active',
+                'categories': ['site'],
+                'showcase_image_url': '/showcase/portfolio.svg',
+                'order_index': 3,
+            },
+            {
+                'title': 'SideQuest',
+                'description': 'Gamified daily adventures and local discovery platform.',
+                'slug': 'sidequest',
+                'kicker': 'Location-aware game layer',
+                'impact': 'A planning-stage quest engine for daily adventure and discovery.',
+                'icon': 'Map',
+                'icon_type': 'lucide',
+                'icon_label': 'Map icon',
+                'link': 'https://sidequest.bynolo.com',
+                'status': 'Planning',
+                'categories': ['app', 'tool'],
+                'showcase_image_url': '/showcase/sidequest.svg',
+                'order_index': 4,
+            },
         ]
         settings = [
             ('brand_name', 'byNolo', 'text', 'Public brand name'),
@@ -149,6 +246,44 @@ def register_cli(app):
                 setting.value = value
                 setting.value_type = value_type
                 setting.description = description
+
+            for title, defaults in project_defaults.items():
+                project = Project.query.filter_by(title=title).first()
+                if not project:
+                    continue
+                for key, value in defaults.items():
+                    if not getattr(project, key, None):
+                        setattr(project, key, value)
+                project.featured = True if project.featured is None else project.featured
+                project.visibility = project.visibility or 'public'
+
+            for defaults in hub_defaults:
+                item = HubItem.query.filter_by(title=defaults['title']).first()
+                if not item:
+                    item = HubItem(
+                        title=defaults['title'],
+                        description=defaults['description'],
+                        icon=defaults['icon'],
+                        link=defaults['link'],
+                        categories_json='[]',
+                    )
+                    db.session.add(item)
+                    created += 1
+                item.description = item.description or defaults['description']
+                item.slug = item.slug or defaults['slug']
+                item.kicker = item.kicker or defaults['kicker']
+                item.impact = item.impact or defaults['impact']
+                item.icon = item.icon or defaults['icon']
+                item.icon_type = item.icon_type or defaults['icon_type']
+                item.icon_label = item.icon_label or defaults['icon_label']
+                item.link = item.link or defaults['link']
+                item.status = item.status or defaults['status']
+                item.showcase_image_url = item.showcase_image_url or defaults['showcase_image_url']
+                item.order_index = item.order_index or defaults['order_index']
+                item.visibility = item.visibility or 'public'
+                item.featured = True if item.featured is None else item.featured
+                if not item.get_categories():
+                    item.set_categories(defaults['categories'])
 
             db.session.commit()
             print(f"Seeded V2 content defaults ({created} new rows)")

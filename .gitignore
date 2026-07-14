@@ -2,12 +2,16 @@
 .env
 .env.*
 api/.env
+!.env.example
+!api/.env.example
 
 # Deployment
 deployment/
 
 # Data Base
 *.db
+instance/
+api/instance/
 
 # Python
 __pycache__/

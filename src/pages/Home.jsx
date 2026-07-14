@@ -1,13 +1,51 @@
 import { motion } from "framer-motion";
 import { ArrowRight, ArrowUpRight, Code2, Compass, Layers3, ServerCog } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PageShell from "../components/PageShell";
 import Section from "../components/Section";
-import { ButtonLink, ShowcaseCard } from "../components/ui";
-import { fallbackProjects, process, services, showcase } from "../data/siteContent";
+import { ButtonLink, InterfacePreview, ShowcaseCard } from "../components/ui";
+import { process, services } from "../data/siteContent";
+import apiClient from "../services/api";
+
+function imageFor(item) {
+  return item?.screenshot_url || item?.showcase_image_url || null;
+}
 
 export default function Home() {
-  const featured = fallbackProjects.slice(0, 3);
+  const [featured, setFeatured] = useState([]);
+  const [hubItems, setHubItems] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchHomeData = async () => {
+      try {
+        const [projectsResponse, hubResponse] = await Promise.all([
+          apiClient.getProjects(),
+          apiClient.getHubItems(),
+        ]);
+        if (!cancelled) {
+          setFeatured(projectsResponse.projects?.slice(0, 3) || []);
+          setHubItems(hubResponse.items?.slice(0, 4) || []);
+        }
+      } catch (error) {
+        console.error("Failed to fetch home data:", error);
+        if (!cancelled) {
+          setFeatured([]);
+          setHubItems([]);
+        }
+      }
+    };
+
+    fetchHomeData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const heroProject = featured[0];
 
   return (
     <PageShell dense background="particles">
@@ -53,7 +91,9 @@ export default function Home() {
             className="relative"
           >
             <div className="rounded-[2rem] border border-white/10 bg-zinc-950/70 p-3 shadow-2xl shadow-black/40 backdrop-blur">
-              <img src="/showcase/portfolio.svg" alt="byNolo portfolio interface preview" className="rounded-[1.35rem]" />
+              <div className="aspect-[16/10] overflow-hidden rounded-[1.35rem] bg-zinc-900">
+                <InterfacePreview image={imageFor(heroProject)} title={heroProject?.title || "byNolo portfolio"} />
+              </div>
             </div>
             <div className="absolute -bottom-6 left-6 right-6 rounded-3xl border border-green-300/20 bg-[#07100d]/90 p-5 shadow-2xl shadow-black/40 backdrop-blur-xl">
               <div className="flex items-center gap-3">
@@ -72,27 +112,30 @@ export default function Home() {
 
       <Section
         eyebrow="Selected work"
-        title="Concrete projects, not placeholder cards."
+        title="Current work with context."
         copy="The work should tell you what was built, why it exists, and where it fits in the byNolo ecosystem."
       >
-        <div className="grid gap-6 lg:grid-cols-3">
-          {featured.map((project) => {
-            const meta = showcase[project.title] || showcase.Portfolio;
-            return (
-              <ShowcaseCard
-                key={project.id}
-                item={project}
-                href={project.live_url || project.github_url}
-                image={meta.image}
-                kicker={meta.kicker}
-                impact={meta.impact}
-                tags={project.tech_stack}
-                status={project.status}
-                compact
-              />
-            );
-          })}
-        </div>
+        {featured.length > 0 ? (
+          <div className="grid gap-6 lg:grid-cols-3">
+            {featured.map((project) => (
+                <ShowcaseCard
+                  key={project.id}
+                  item={project}
+                  href={project.live_url || project.github_url}
+                  image={imageFor(project)}
+                  kicker={project.kicker}
+                  impact={project.impact}
+                  tags={project.tech_stack}
+                  status={project.status}
+                  compact
+                />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.04] p-6 text-zinc-300">
+            Portfolio work is being curated in the CMS.
+          </div>
+        )}
       </Section>
 
       <Section eyebrow="What I build" title="A small studio that can handle the whole product surface.">
@@ -132,10 +175,10 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {fallbackProjects.slice(0, 4).map((project) => (
-              <div key={project.title} className="rounded-2xl border border-white/10 bg-[#07100d]/75 p-4">
-                <p className="text-sm font-semibold text-white">{project.title}</p>
-                <p className="mt-2 line-clamp-2 text-xs leading-5 text-zinc-500">{project.description}</p>
+            {(hubItems.length ? hubItems : featured).slice(0, 4).map((item) => (
+              <div key={item.id || item.title} className="rounded-2xl border border-white/10 bg-[#07100d]/75 p-4">
+                <p className="text-sm font-semibold text-white">{item.title}</p>
+                <p className="mt-2 line-clamp-2 text-xs leading-5 text-zinc-500">{item.impact || item.description}</p>
               </div>
             ))}
           </div>

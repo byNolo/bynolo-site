@@ -3,6 +3,7 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+from werkzeug.utils import secure_filename
 import os
 import re
 import secrets
@@ -11,6 +12,7 @@ import unicodedata
 
 VALID_STATUSES = {'Active', 'Live', 'Beta', 'Development', 'Planning', 'Archived'}
 VALID_VISIBILITY = {'public', 'draft', 'archived'}
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
 
 
 def slugify(value):
@@ -52,6 +54,36 @@ def screenshot_dir(app):
 
 def public_upload_url(filename):
     return f'/uploads/screenshots/{filename}'
+
+
+def save_uploaded_screenshot(app, uploaded_file, slug):
+    if not uploaded_file or not uploaded_file.filename:
+        return {
+            'ok': False,
+            'status': 'error',
+            'error': 'No screenshot file was uploaded.'
+        }
+
+    original_name = secure_filename(uploaded_file.filename)
+    extension = original_name.rsplit('.', 1)[-1].lower() if '.' in original_name else ''
+    if extension not in ALLOWED_IMAGE_EXTENSIONS:
+        return {
+            'ok': False,
+            'status': 'error',
+            'error': 'Screenshots must be PNG, JPG, WebP, or GIF files.'
+        }
+
+    filename = f'{slugify(slug)}-{datetime.utcnow().strftime("%Y%m%d%H%M%S")}-{secrets.token_hex(3)}.{extension}'
+    output_path = screenshot_dir(app) / filename
+    uploaded_file.save(output_path)
+
+    return {
+        'ok': True,
+        'status': 'ready',
+        'url': public_upload_url(filename),
+        'captured_at': datetime.utcnow(),
+        'error': None
+    }
 
 
 def capture_screenshot(app, url, slug, full_page=True):

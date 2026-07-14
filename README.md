@@ -38,8 +38,11 @@ Important backend environment variables live in `api/.env`:
 ADMIN_PASSWORD=change-this-admin-password
 SECRET_KEY=change-this-too
 UPLOAD_FOLDER=instance/uploads
+MAX_UPLOAD_MB=8
 DATABASE_URL=sqlite:///bynolo.db
 ```
+
+Project and hub edit screens support both automatic Playwright capture and manual screenshot uploads. Uploaded images are saved under `UPLOAD_FOLDER/screenshots` and served at `/uploads/screenshots/<filename>`.
 
 After backend dependency install, install the screenshot browser once:
 

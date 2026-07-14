@@ -35,6 +35,38 @@ export function ButtonLink({ href, to, children, variant = "primary", className 
   );
 }
 
+export function InterfacePreview({ image, title, className = "" }) {
+  if (image) {
+    return (
+      <img
+        src={image}
+        alt={`${title} interface preview`}
+        className={`h-full w-full object-cover transition duration-700 group-hover:scale-[1.025] ${className}`}
+        loading="lazy"
+      />
+    );
+  }
+
+  return (
+    <div className="flex h-full w-full flex-col justify-between overflow-hidden bg-[#07100d] p-5">
+      <div className="flex items-center gap-2">
+        <span className="h-2.5 w-2.5 rounded-full bg-green-300" />
+        <span className="h-2.5 w-2.5 rounded-full bg-zinc-600" />
+        <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
+      </div>
+      <div className="grid gap-3">
+        <div className="h-3 w-2/3 rounded-full bg-white/10" />
+        <div className="h-3 w-5/6 rounded-full bg-white/[0.07]" />
+        <div className="h-16 rounded-2xl border border-green-300/15 bg-green-300/[0.06]" />
+      </div>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-green-300">byNolo</p>
+        <p className="mt-1 text-lg font-semibold text-white">{title}</p>
+      </div>
+    </div>
+  );
+}
+
 export function ShowcaseCard({ item, href, image, kicker, impact, tags = [], status, compact = false }) {
   const resolvedHref = href || item?.live_url || item?.github_url || "#";
   const disabled = resolvedHref === "#";
@@ -49,12 +81,7 @@ export function ShowcaseCard({ item, href, image, kicker, impact, tags = [], sta
         aria-disabled={disabled}
       >
         <div className="aspect-[16/10] overflow-hidden border-b border-white/10 bg-zinc-900">
-          <img
-            src={image}
-            alt={`${item.title} interface preview`}
-            className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.025]"
-            loading="lazy"
-          />
+          <InterfacePreview image={image} title={item.title} />
         </div>
         <div className={compact ? "p-5" : "p-6 sm:p-7"}>
           <div className="mb-4 flex flex-wrap items-center gap-2">

@@ -1,6 +1,7 @@
 from datetime import datetime
 from functools import wraps
 from flask import Blueprint, current_app, jsonify, redirect, render_template_string, request, session, url_for
+from markupsafe import escape
 from werkzeug.security import check_password_hash, generate_password_hash
 import os
 import secrets
@@ -13,6 +14,7 @@ from .services import (
     check_url_health,
     is_safe_url,
     normalize_bool,
+    save_uploaded_screenshot,
     slugify,
 )
 
@@ -159,6 +161,14 @@ def set_screenshot_result(record, result):
     record.screenshot_error = result.get('error')
 
 
+def apply_uploaded_screenshot(record, uploaded_file):
+    if not uploaded_file or not uploaded_file.filename:
+        return None
+    result = save_uploaded_screenshot(current_app, uploaded_file, record.slug or record.title)
+    set_screenshot_result(record, result)
+    return result
+
+
 def set_health_result(record, result):
     record.health_status = result['status']
     record.health_checked_at = datetime.utcnow()
@@ -221,6 +231,10 @@ def csrf_input():
     return f'<input type="hidden" name="csrf_token" value="{csrf_token()}">'
 
 
+def h(value):
+    return escape(value or '')
+
+
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -261,7 +275,7 @@ def dashboard():
 
 
 PROJECT_FORM = """
-<form method="post" class="grid">
+<form method="post" action="{action}" class="grid" enctype="multipart/form-data">
   {csrf}
   <label>Title <input name="title" value="{title}" required></label>
   <label>Slug <input name="slug" value="{slug}"></label>
@@ -271,9 +285,11 @@ PROJECT_FORM = """
   <label>Live URL <input name="live_url" value="{live_url}"></label>
   <label>Tech stack <input name="tech_stack" value="{tech_stack}"></label>
   <label>Showcase image URL <input name="showcase_image_url" value="{showcase_image_url}"></label>
+  <label>Screenshot URL <input name="screenshot_url" value="{screenshot_url}"></label>
+  <label>Upload screenshot <input name="screenshot_file" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label>
   <label>Accent <input name="accent" value="{accent}"></label>
   <label>Order <input name="order_index" value="{order_index}" type="number"></label>
-  <label>Visibility <select name="visibility"><option value="public">public</option><option value="draft">draft</option><option value="archived">archived</option></select></label>
+  <label>Visibility <select name="visibility"><option value="public" {visibility_public}>public</option><option value="draft" {visibility_draft}>draft</option><option value="archived" {visibility_archived}>archived</option></select></label>
   <label>Featured <input name="featured" type="checkbox" value="true" {featured}></label>
   <label style="grid-column:1/-1">Description <textarea name="description" rows="3">{description}</textarea></label>
   <label style="grid-column:1/-1">Impact <textarea name="impact" rows="3">{impact}</textarea></label>
@@ -290,6 +306,7 @@ def projects():
             return 'CSRF validation failed', 400
         project = Project(title=request.form.get('title', ''), description='')
         update_project(project, request.form)
+        apply_uploaded_screenshot(project, request.files.get('screenshot_file'))
         db.session.add(project)
         db.session.commit()
         return redirect(url_for('admin.projects'))
@@ -306,26 +323,33 @@ def project_update(item_id):
         return 'CSRF validation failed', 400
     project = Project.query.get_or_404(item_id)
     update_project(project, request.form)
+    apply_uploaded_screenshot(project, request.files.get('screenshot_file'))
     db.session.commit()
     return redirect(url_for('admin.projects'))
 
 
 def project_form(project):
+    visibility = project.visibility or 'public'
     return PROJECT_FORM.format(
+        action=url_for('admin.project_update', item_id=project.id) if project.id else url_for('admin.projects'),
         csrf=csrf_input(),
-        title=project.title or '',
-        slug=project.slug or '',
-        kicker=project.kicker or '',
-        status=project.status or 'Active',
-        github_url=project.github_url or '',
-        live_url=project.live_url or '',
-        tech_stack=', '.join(project.get_tech_stack()) if project.id else '',
-        showcase_image_url=project.showcase_image_url or '',
-        accent=project.accent or 'green',
+        title=h(project.title),
+        slug=h(project.slug),
+        kicker=h(project.kicker),
+        status=h(project.status or 'Active'),
+        github_url=h(project.github_url),
+        live_url=h(project.live_url),
+        tech_stack=h(', '.join(project.get_tech_stack()) if project.id else ''),
+        showcase_image_url=h(project.showcase_image_url),
+        screenshot_url=h(project.screenshot_url),
+        accent=h(project.accent or 'green'),
         order_index=project.order_index or 0,
         featured='checked' if project.featured else '',
-        description=project.description or '',
-        impact=project.impact or '',
+        visibility_public='selected' if visibility == 'public' else '',
+        visibility_draft='selected' if visibility == 'draft' else '',
+        visibility_archived='selected' if visibility == 'archived' else '',
+        description=h(project.description),
+        impact=h(project.impact),
     )
 
 
@@ -353,11 +377,11 @@ def project_table(rows):
 @require_admin
 def project_edit(item_id):
     project = Project.query.get_or_404(item_id)
-    return page(f'Edit {project.title}', f'<h1>Edit Project</h1><form method="post" action="{url_for("admin.project_update", item_id=project.id)}" class="grid">{project_form(project).split("<form method=\"post\" class=\"grid\">", 1)[1]}')
+    return page(f'Edit {project.title}', f'<h1>Edit Project</h1>{project_form(project)}')
 
 
 HUB_FORM = """
-<form method="post" class="grid">
+<form method="post" action="{action}" class="grid" enctype="multipart/form-data">
   {csrf}
   <label>Title <input name="title" value="{title}" required></label>
   <label>Slug <input name="slug" value="{slug}"></label>
@@ -368,8 +392,11 @@ HUB_FORM = """
   <label>Icon <input name="icon" value="{icon}"></label>
   <label>Icon type <input name="icon_type" value="{icon_type}"></label>
   <label>Showcase image URL <input name="showcase_image_url" value="{showcase_image_url}"></label>
+  <label>Screenshot URL <input name="screenshot_url" value="{screenshot_url}"></label>
+  <label>Upload screenshot <input name="screenshot_file" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label>
   <label>Accent <input name="accent" value="{accent}"></label>
   <label>Order <input name="order_index" value="{order_index}" type="number"></label>
+  <label>Visibility <select name="visibility"><option value="public" {visibility_public}>public</option><option value="draft" {visibility_draft}>draft</option><option value="archived" {visibility_archived}>archived</option></select></label>
   <label>Featured <input name="featured" type="checkbox" value="true" {featured}></label>
   <label style="grid-column:1/-1">Description <textarea name="description" rows="3">{description}</textarea></label>
   <label style="grid-column:1/-1">Impact <textarea name="impact" rows="3">{impact}</textarea></label>
@@ -386,6 +413,7 @@ def hub():
             return 'CSRF validation failed', 400
         item = HubItem(title=request.form.get('title', ''), description='', icon='PanelsTopLeft', link='#', categories_json='[]')
         update_hub_item(item, request.form)
+        apply_uploaded_screenshot(item, request.files.get('screenshot_file'))
         db.session.add(item)
         db.session.commit()
         return redirect(url_for('admin.hub'))
@@ -402,6 +430,7 @@ def hub_update(item_id):
         return 'CSRF validation failed', 400
     item = HubItem.query.get_or_404(item_id)
     update_hub_item(item, request.form)
+    apply_uploaded_screenshot(item, request.files.get('screenshot_file'))
     db.session.commit()
     return redirect(url_for('admin.hub'))
 
@@ -410,26 +439,32 @@ def hub_update(item_id):
 @require_admin
 def hub_edit(item_id):
     item = HubItem.query.get_or_404(item_id)
-    return page(f'Edit {item.title}', f'<h1>Edit Hub Item</h1><form method="post" action="{url_for("admin.hub_update", item_id=item.id)}" class="grid">{hub_form(item).split("<form method=\"post\" class=\"grid\">", 1)[1]}')
+    return page(f'Edit {item.title}', f'<h1>Edit Hub Item</h1>{hub_form(item)}')
 
 
 def hub_form(item):
+    visibility = item.visibility or 'public'
     return HUB_FORM.format(
+        action=url_for('admin.hub_update', item_id=item.id) if item.id else url_for('admin.hub'),
         csrf=csrf_input(),
-        title=item.title or '',
-        slug=item.slug or '',
-        kicker=item.kicker or '',
-        status=item.status or 'Active',
-        link=item.link or '',
-        categories=', '.join(item.get_categories()) if item.id else '',
-        icon=item.icon or 'PanelsTopLeft',
-        icon_type=item.icon_type or 'lucide',
-        showcase_image_url=item.showcase_image_url or '',
-        accent=item.accent or 'green',
+        title=h(item.title),
+        slug=h(item.slug),
+        kicker=h(item.kicker),
+        status=h(item.status or 'Active'),
+        link=h(item.link),
+        categories=h(', '.join(item.get_categories()) if item.id else ''),
+        icon=h(item.icon or 'PanelsTopLeft'),
+        icon_type=h(item.icon_type or 'lucide'),
+        showcase_image_url=h(item.showcase_image_url),
+        screenshot_url=h(item.screenshot_url),
+        accent=h(item.accent or 'green'),
         order_index=item.order_index or 0,
         featured='checked' if item.featured else '',
-        description=item.description or '',
-        impact=item.impact or '',
+        visibility_public='selected' if visibility == 'public' else '',
+        visibility_draft='selected' if visibility == 'draft' else '',
+        visibility_archived='selected' if visibility == 'archived' else '',
+        description=h(item.description),
+        impact=h(item.impact),
     )
 
 
@@ -711,6 +746,24 @@ def api_capture_screenshot():
     set_screenshot_result(record, result)
     db.session.commit()
     return jsonify({'result': result, 'item': record.to_dict()})
+
+
+@admin_api_bp.route('/screenshots/upload', methods=['POST'])
+@require_admin
+def api_upload_screenshot():
+    target_type = request.form.get('type')
+    target_id = request.form.get('id')
+    model = Project if target_type == 'project' else HubItem if target_type == 'hub' else None
+    if not model or not target_id:
+        return jsonify({'error': 'type must be project or hub and id is required'}), 400
+
+    record = model.query.get_or_404(int(target_id))
+    result = apply_uploaded_screenshot(record, request.files.get('screenshot_file') or request.files.get('file'))
+    if not result:
+        return jsonify({'error': 'screenshot_file is required'}), 400
+    db.session.commit()
+    status_code = 200 if result.get('ok') else 400
+    return jsonify({'result': result, 'item': record.to_dict()}), status_code
 
 
 @admin_api_bp.route('/screenshots/capture-all', methods=['POST'])
