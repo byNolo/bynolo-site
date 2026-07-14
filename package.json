@@ -10,6 +10,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "serve:fullstack": "node server.mjs",
     "start": "./dev start",
     "stop": "./dev stop",
     "status": "./dev status",

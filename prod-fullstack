@@ -7,9 +7,14 @@ set -e
 
 # Handle stop command
 if [ "$1" = "stop" ]; then
+    FRONTEND_PORT=${2:-8080}
     echo "🛑 Stopping full-stack production server..."
     tmux kill-session -t bynolo-prod-backend 2>/dev/null || true
+    pkill -f "node.*server.mjs" 2>/dev/null || true
     pkill -f "serve.*dist" 2>/dev/null || true
+    for pid in $(lsof -t -i :$FRONTEND_PORT 2>/dev/null); do
+        kill "$pid" 2>/dev/null || true
+    done
     echo "✅ Production servers stopped"
     exit 0
 fi
@@ -23,12 +28,6 @@ echo "🚀 Starting byNolo full-stack production server..."
 if [ ! -d "dist" ] || [ "src" -nt "dist" ]; then
     echo "📦 Building frontend..."
     npm run build
-fi
-
-# Check if serve is available for frontend
-if ! command -v serve &> /dev/null; then
-    echo "📦 Installing serve..."
-    npm install -g serve
 fi
 
 # Setup backend environment
@@ -76,13 +75,13 @@ echo ""
 echo "🌐 Frontend: http://localhost:$FRONTEND_PORT"
 echo "🔧 Backend:  http://localhost:$BACKEND_PORT"
 echo "📋 API Base:  http://localhost:$BACKEND_PORT/api"
+echo "🔒 Admin:     http://localhost:$FRONTEND_PORT/admin"
 echo ""
 echo "📋 For Cloudflare Tunnel:"
-echo "   Frontend: cloudflared tunnel --url http://localhost:$FRONTEND_PORT"
-echo "   Full-stack: Use nginx proxy or expose both ports"
+echo "   cloudflared tunnel --url http://localhost:$FRONTEND_PORT"
 echo ""
 echo "🛑 To stop: ./prod-fullstack stop"
 echo ""
 
-# Start frontend server (this will block)
-serve -s dist -l $FRONTEND_PORT
+# Start frontend server with backend proxy for /api, /admin, /uploads, and /health.
+PORT=$FRONTEND_PORT BACKEND_URL=http://127.0.0.1:$BACKEND_PORT node server.mjs

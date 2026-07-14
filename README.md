@@ -73,6 +73,7 @@ For Cloudflare Tunnel:
 
 For full-stack with API:
 1. `./prod-fullstack`
-2. `cloudflared tunnel --url http://localhost`
+2. `cloudflared tunnel --url http://localhost:8080`
+3. Admin is available at `/admin` on the same public domain.
 
 See [GUIDE.md](GUIDE.md) for complete documentation.
